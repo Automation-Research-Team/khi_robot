@@ -16,16 +16,16 @@
     constraints:
       goal_time: 2.0                   # Defaults to zero
       stopped_velocity_tolerance: 0.1 # Defaults to 0.01
-      lower_joint1:
+      joint1:
         trajectory: 0 
         goal: 0.2       
-      lower_joint2:
+      joint2:
         trajectory: 0 
         goal: 0.2       
-      lower_joint3:
+      joint3:
         trajectory: 0 
         goal: 0.2       
-      lower_joint4:
+      joint4:
         trajectory: 0 
         goal: 0.2       
 
