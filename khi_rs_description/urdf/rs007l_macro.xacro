@@ -4,14 +4,14 @@
 
     <xacro:include filename="$(find khi_rs_description)/urdf/rs.transmission.xacro" />
     <xacro:add_transmissions prefix="${prefix}"/>
-    <xacro:include filename="$(find khi_rs_description)/urdf/common.gazebo.xacro" />
+    <!-- <xacro:include filename="$(find khi_rs_description)/urdf/common.gazebo.xacro" /> -->
 
     <!-- link rviz colors -->
-    <material name="White">
+    <material name="${prefix}White">
       <color rgba="1 1 1 1"/>
     </material>
 
-    <material name="Black">
+    <material name="${prefix}Black">
       <color rgba="0 0 0 1"/>
     </material>
 
@@ -76,14 +76,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J0.stl"/>
         </geometry>
-        <material name="White"/>
+        <material name="${prefix}White"/>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J0.stl"/>
         </geometry>
-        <material name="White"/>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
       <xacro:default_inertial mass="${j0_mass}"/>
@@ -105,14 +104,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J1.stl"/>
         </geometry>
-        <material name="White"/>
+        <material name="${prefix}White"/>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J1.stl"/>
         </geometry>
-        <material name="White"/>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
       <xacro:default_inertial mass="${j1_mass}"/>
@@ -133,14 +131,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J2.stl"/>
         </geometry>
-        <material name="White"/>
+        <material name="${prefix}White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J2.stl"/>
         </geometry>
-        <material name="White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </collision>
       <xacro:default_inertial mass="0${j2_mass}"/>
@@ -161,14 +158,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J3.stl"/>
         </geometry>
-        <material name="White"/>
+        <material name="${prefix}White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J3.stl"/>
         </geometry>
-        <material name="White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </collision>
       <xacro:default_inertial mass="${j3_mass}"/>
@@ -189,14 +185,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J4.stl"/>
         </geometry>
-        <material name="White"/>
+        <material name="${prefix}White"/>
         <origin xyz="0 0 ${j4_length}" rpy="0 0 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J4.stl"/>
         </geometry>
-        <material name="White"/>
         <origin xyz="0 0 ${j4_length}" rpy="0 0 0"/>
       </collision>
       <xacro:default_inertial mass="${j4_mass}"/>
@@ -217,14 +212,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J5.stl"/>
         </geometry>
-        <material name="White"/>
+        <material name="${prefix}White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j4_j5_roty*-1} 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J5.stl"/>
         </geometry>
-        <material name="White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j4_j5_roty*-1} 0"/>
       </collision>
       <xacro:default_inertial mass="${j5_mass}"/>
@@ -245,14 +239,13 @@
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J6.stl"/>
         </geometry>
-        <material name="Black"/>
+        <material name="${prefix}Black"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
       </visual>
       <collision>
         <geometry>
           <mesh filename="package://khi_rs_description/meshes/RS007L_J6.stl"/>
         </geometry>
-        <material name="Black"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
       </collision>
       <xacro:default_inertial mass="${j6_mass}"/>

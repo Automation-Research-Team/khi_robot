@@ -4,7 +4,7 @@
 
     <xacro:include filename="$(find khi_rs_description)/urdf/rs.transmission.xacro" />
     <xacro:add_transmissions prefix="${prefix}"/>
-    <xacro:include filename="$(find khi_rs_description)/urdf/common.gazebo.xacro" />
+    <!-- <xacro:include filename="$(find khi_rs_description)/urdf/common.gazebo.xacro" /> -->
 
     <!-- link rviz colors -->
     <material name="White">
