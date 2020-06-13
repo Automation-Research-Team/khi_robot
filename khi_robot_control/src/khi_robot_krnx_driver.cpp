@@ -1068,4 +1068,44 @@ bool KhiRobotKrnxDriver::commandHandler( khi_robot_msgs::KhiRobotCmd::Request& r
     return true;
 }
 
+void
+KhiRobotKrnxDriver::publishDIO()
+{
+    int		cont_no = 0;
+    TKrnxIoInfo io;
+    const auto	dcode = krnx_GetCurIoInfo(cont_no, &io);
+
+    if (dcode != KRNX_NOERROR)
+    {
+	ROS_WARN("Failed to get current IO info(%x)", dcode);
+	return;
+    }
+
+    khi_robot_msgs::KhiGetDIO	msg;
+    std::copy(std::begin(io.io_do), std::end(io.io_do), std::begin(msg.out));
+    std::copy(std::begin(io.io_di), std::end(io.io_di), std::begin(msg.in));
+    std::copy(std::begin(io.internal), std::end(io.internal),
+	      std::begin(msg.internal));
+
+}
+
+void
+KhiRobotKrnxDriver::setDIO(const khi_robot_msgs::KhiSetDIOConstPtr& msg)
+{
+    const int			cont_no = 0;
+    std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
+
+    const auto	IoSet = (msg->din ? krnx_IoSetDI : krnx_IoSetDO);
+    const auto	dcode = IoSet(cont_no,
+			      reinterpret_cast<const char*>(msg->data.data()),
+			      reinterpret_cast<const char*>(msg->mask.data()),
+			      msg->size);
+
+    if (dcode != KRNX_NOERROR)
+    {
+	ROS_ERROR("Failed to set DIO (%x)", dcode);
+	return;
+    }
+}
+
 } // end of khi_robot_control namespace

@@ -37,6 +37,8 @@
 
 #include <string>
 #include <khi_robot_msgs/KhiRobotCmd.h>
+#include <khi_robot_msgs/KhiGetDIO.h>
+#include <khi_robot_msgs/KhiSetDIO.h>
 
 namespace khi_robot_control
 {

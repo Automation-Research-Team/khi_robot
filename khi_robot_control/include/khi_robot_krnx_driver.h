@@ -75,6 +75,8 @@ public:
     bool updateState( const int& cont_no, const KhiRobotData& data ) override;
     bool getPeriodDiff( const int& cont_no, double& diff ) override;
     bool commandHandler( khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res ) override;
+    void publishDIO();
+    void setDIO(const khi_robot_msgs::KhiSetDIOConstPtr& msg);
 
 private:
     /* general */
