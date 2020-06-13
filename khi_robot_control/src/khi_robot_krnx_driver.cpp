@@ -1069,9 +1069,9 @@ bool KhiRobotKrnxDriver::commandHandler( khi_robot_msgs::KhiRobotCmd::Request& r
 }
 
 void
-KhiRobotKrnxDriver::publishDIO()
+KhiRobotKrnxDriver::publishDIO(const int& cont_no,
+			       const ros::Publisher& publisher)
 {
-    int		cont_no = 0;
     TKrnxIoInfo io;
     const auto	dcode = krnx_GetCurIoInfo(cont_no, &io);
 
@@ -1087,12 +1087,13 @@ KhiRobotKrnxDriver::publishDIO()
     std::copy(std::begin(io.internal), std::end(io.internal),
 	      std::begin(msg.internal));
 
+    publisher.publish(msg);
 }
 
 void
-KhiRobotKrnxDriver::setDIO(const khi_robot_msgs::KhiSetDIOConstPtr& msg)
+KhiRobotKrnxDriver::setDIO(const int& cont_no,
+			   const khi_robot_msgs::KhiSetDIOConstPtr& msg)
 {
-    const int			cont_no = 0;
     std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
 
     const auto	IoSet = (msg->din ? krnx_IoSetDI : krnx_IoSetDO);

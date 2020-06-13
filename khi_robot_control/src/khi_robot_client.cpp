@@ -39,7 +39,7 @@
 
 namespace khi_robot_control
 {
-void KhiCommandService( KhiRobotDriver* driver )
+void KhiCommandService( KhiRobotDriver* driver, const int& cont_no )
 {
     if ( driver == NULL ) return;
 
@@ -48,7 +48,20 @@ void KhiCommandService( KhiRobotDriver* driver )
     ros::AsyncSpinner spinner(boost::thread::hardware_concurrency()-1);
     ros::NodeHandlePtr node = boost::make_shared<ros::NodeHandle>();
     ros::ServiceServer service = node->advertiseService( "khi_robot_command_service", &KhiRobotDriver::commandHandler, driver );
+    ros::Subscriber setDIO_sub = node->subscribe<khi_robot_msgs::KhiSetDIO>(
+				     "khi_set_dio", 10,
+				     boost::bind(&KhiRobotDriver::setDIO,
+						 driver, cont_no, _1));
+    ros::Publisher getDIO_pub = node->advertise<khi_robot_msgs::KhiGetDIO>(
+				    "khi_dio", 10);
     spinner.start();
+    ros::Rate	rate(100.0);
+    while (ros::ok())
+    {
+	driver->publishDIO(cont_no, getDIO_pub);
+	rate.sleep();
+    }
+
     ros::waitForShutdown();
 }
 
@@ -136,7 +149,7 @@ void KhiRobotClient::startCommandService()
 {
     if ( driver == NULL ) { return; }
 
-    boost::thread thread_srv( KhiCommandService, driver );
+    boost::thread thread_srv( KhiCommandService, driver, cont_no );
 }
 
 } // end of khi_robot_control namespace
