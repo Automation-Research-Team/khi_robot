@@ -1038,6 +1038,43 @@ bool KhiRobotKrnxDriver::commandHandler( khi_robot_msgs::KhiRobotCmd::Request& r
                         else         { res.cmd_ret = "0";}
                     }
                 }
+                else if ( api_cmd == "get_bits" )
+		{
+                    dcode = krnx_GetCurIoInfo( cont_no, &io );
+                    res.driver_ret = dcode;
+                    arg = std::atoi( vlist[1].c_str() ) - 1;
+
+		    uint16_t	bits;
+                    if ( arg >= 0 && arg < KHI_MAX_SIG_SIZE )
+                    {
+                        /* DO */
+                        bits = *(reinterpret_cast<const uint16_t*>(io.io_do)
+				 + arg/16);
+                    }
+                    else if ( arg >= 1000 && arg < 1000 + KHI_MAX_SIG_SIZE )
+                    {
+                        /* DI */
+                        arg -= 1000;
+                        bits = *(reinterpret_cast<const uint16_t*>(io.io_di)
+				 + arg/16);
+                    }
+                    else if ( arg >= 2000 && arg < 2000 + KHI_MAX_SIG_SIZE )
+                    {
+                        /* INTERNAL */
+                        arg -= 2000;
+                        bits = *(reinterpret_cast<const uint16_t*>(io.internal)
+				 + arg/16);
+                    }
+                    else
+                    {
+                        res.driver_ret = KRNX_E_BADARGS;
+                        res.cmd_ret = "INVALID ARGS";
+                    }
+                    if ( res.driver_ret == KRNX_NOERROR )
+                    {
+			res.cmd_ret = std::to_string(bits);
+                    }
+		}
                 else if ( api_cmd == "set_signal" )
                 {
                     std::string as_cmd = req.cmd;
@@ -1046,6 +1083,14 @@ bool KhiRobotKrnxDriver::commandHandler( khi_robot_msgs::KhiRobotCmd::Request& r
                     res.driver_ret = dcode;
                     res.as_ret = acode;
                 }
+		else if ( api_cmd == "set_bits" )
+		{
+                    std::string as_cmd = req.cmd;
+                    as_cmd.replace( 0, strlen("set_bits"), "BITS" );
+                    dcode = execAsMonCmd( cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode );
+                    res.driver_ret = dcode;
+                    res.as_ret = acode;
+		}
                 else
                 {
                     res.driver_ret = KRNX_E_BADARGS;
