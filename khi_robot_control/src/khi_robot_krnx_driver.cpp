@@ -1073,7 +1073,12 @@ KhiRobotKrnxDriver::publishDIO(const int& cont_no,
 			       const ros::Publisher& publisher)
 {
     TKrnxIoInfo io;
-    const auto	dcode = krnx_GetCurIoInfo(cont_no, &io);
+    int		dcode = KRNX_NOERROR;
+
+    {
+	std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
+	dcode = krnx_GetCurIoInfo(cont_no, &io);
+    }
 
     if (dcode != KRNX_NOERROR)
     {
@@ -1094,13 +1099,16 @@ void
 KhiRobotKrnxDriver::setDIO(const int& cont_no,
 			   const khi_robot_msgs::KhiSetDIOConstPtr& msg)
 {
-    std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
-
     const auto	IoSet = (msg->din ? krnx_IoSetDI : krnx_IoSetDO);
-    const auto	dcode = IoSet(cont_no,
-			      reinterpret_cast<const char*>(msg->data.data()),
-			      reinterpret_cast<const char*>(msg->mask.data()),
-			      msg->size);
+    int		dcode = KRNX_NOERROR;
+
+    {
+	std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
+	dcode = IoSet(cont_no,
+		      reinterpret_cast<const char*>(msg->data.data()),
+		      reinterpret_cast<const char*>(msg->mask.data()),
+		      msg->size);
+    }
 
     if (dcode != KRNX_NOERROR)
     {
