@@ -70,7 +70,7 @@ extern "C"
 	
 #define INT_CBUF_SIZ	512
 
-//#define NON_COMPATIBLE
+#define NON_COMPATIBLE
 /*
  * !! íç à” !!
  *
