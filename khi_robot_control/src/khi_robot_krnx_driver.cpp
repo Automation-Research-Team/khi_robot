@@ -1115,7 +1115,8 @@ bool KhiRobotKrnxDriver::commandHandler( khi_robot_msgs::KhiRobotCmd::Request& r
 
 void
 KhiRobotKrnxDriver::publishDIO(const int& cont_no,
-			       const ros::Publisher& publisher)
+			       realtime_tools::RealtimePublisher<
+			           khi_robot_msgs::KhiGetDIO>& publisher)
 {
     TKrnxIoInfo io;
     int		dcode = KRNX_NOERROR;
@@ -1127,17 +1128,21 @@ KhiRobotKrnxDriver::publishDIO(const int& cont_no,
 
     if (dcode != KRNX_NOERROR)
     {
-	ROS_WARN("Failed to get current IO info(%x)", dcode);
+      //ROS_WARN("Failed to get current IO info(%x)", -dcode);
 	return;
     }
 
-    khi_robot_msgs::KhiGetDIO	msg;
-    std::copy(std::begin(io.io_do), std::end(io.io_do), std::begin(msg.out));
-    std::copy(std::begin(io.io_di), std::end(io.io_di), std::begin(msg.in));
-    std::copy(std::begin(io.internal), std::end(io.internal),
-	      std::begin(msg.internal));
+    if (publisher.trylock())
+    {
+	std::copy(std::begin(io.io_do), std::end(io.io_do),
+		  std::begin(publisher.msg_.out));
+	std::copy(std::begin(io.io_di), std::end(io.io_di),
+		  std::begin(publisher.msg_.in));
+	std::copy(std::begin(io.internal), std::end(io.internal),
+		  std::begin(publisher.msg_.internal));
 
-    publisher.publish(msg);
+	publisher.unlockAndPublish();
+    }
 }
 
 void
@@ -1152,12 +1157,12 @@ KhiRobotKrnxDriver::setDIO(const int& cont_no,
 	dcode = IoSet(cont_no,
 		      reinterpret_cast<const char*>(msg->data.data()),
 		      reinterpret_cast<const char*>(msg->mask.data()),
-		      msg->size);
+		      msg->data.size());
     }
 
     if (dcode != KRNX_NOERROR)
     {
-	ROS_ERROR("Failed to set DIO (%x)", dcode);
+	ROS_ERROR("Failed to set DIO (%x)", -dcode);
 	return;
     }
 }

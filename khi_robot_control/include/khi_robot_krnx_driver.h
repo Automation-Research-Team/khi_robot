@@ -38,6 +38,7 @@
 #include <mutex>
 #include <ros/ros.h>
 #include <ros/console.h>
+#include <realtime_tools/realtime_publisher.h>
 #include <khi_robot_driver.h>
 #include <krnx.h>
 
@@ -75,8 +76,11 @@ public:
     bool updateState( const int& cont_no, const KhiRobotData& data ) override;
     bool getPeriodDiff( const int& cont_no, double& diff ) override;
     bool commandHandler( khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res ) override;
-    void publishDIO(const int& cont_no, const ros::Publisher& publisher) override;
-    void setDIO(const int& cont_no, const khi_robot_msgs::KhiSetDIOConstPtr& msg) override;
+    void publishDIO( const int& cont_no,
+		     realtime_tools::RealtimePublisher<
+		         khi_robot_msgs::KhiGetDIO>& publisher ) override;
+    void setDIO( const int& cont_no,
+		 const khi_robot_msgs::KhiSetDIOConstPtr& msg ) override;
 
 private:
     /* general */

@@ -36,6 +36,7 @@
 #define KHI_ROBOT_DRIVER_H
 
 #include <string>
+#include <realtime_tools/realtime_publisher.h>
 #include <khi_robot_msgs/KhiRobotCmd.h>
 #include <khi_robot_msgs/KhiGetDIO.h>
 #include <khi_robot_msgs/KhiSetDIO.h>
@@ -302,7 +303,9 @@ public:
     virtual bool updateState( const int& cont_no, const KhiRobotData& data ) = 0;
     virtual bool getPeriodDiff( const int& cont_no, double& diff ) = 0;
     virtual bool commandHandler( khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res ) = 0;
-    virtual void publishDIO( const int& cont_no, const ros::Publisher& publisher ) = 0;
+    virtual void publishDIO( const int& cont_no,
+			     realtime_tools::RealtimePublisher<
+			         khi_robot_msgs::KhiGetDIO>& publisher ) = 0;
     virtual void setDIO( const int& cont_no, const khi_robot_msgs::KhiSetDIOConstPtr& msg ) = 0;
 
 protected:
