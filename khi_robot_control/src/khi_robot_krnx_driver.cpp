@@ -929,9 +929,8 @@ bool KhiRobotKrnxDriver::syncRtcPos( const int& cont_no, KhiRobotData& data )
     return true;
 }
 
-bool KhiRobotKrnxDriver::commandHandler( khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res)
+bool KhiRobotKrnxDriver::commandHandler( const int& cont_no, khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res)
 {
-    int cont_no = 0;
     char resp[KRNX_MSGSIZE] = { 0 };
     int acode;
     int dcode;

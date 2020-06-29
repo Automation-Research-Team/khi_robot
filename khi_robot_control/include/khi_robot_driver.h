@@ -302,11 +302,14 @@ public:
     virtual bool writeData( const int& cont_no, const KhiRobotData& data ) = 0;
     virtual bool updateState( const int& cont_no, const KhiRobotData& data ) = 0;
     virtual bool getPeriodDiff( const int& cont_no, double& diff ) = 0;
-    virtual bool commandHandler( khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res ) = 0;
-    virtual void publishDIO( const int& cont_no,
-			     realtime_tools::RealtimePublisher<
-			         khi_robot_msgs::KhiGetDIO>& publisher ) = 0;
-    virtual void setDIO( const int& cont_no, const khi_robot_msgs::KhiSetDIOConstPtr& msg ) = 0;
+    virtual bool commandHandler(const int& cont_no,
+				khi_robot_msgs::KhiRobotCmd::Request& req,
+				khi_robot_msgs::KhiRobotCmd::Response& res) = 0;
+    virtual void publishDIO(const int& cont_no,
+			    realtime_tools::RealtimePublisher<
+			        khi_robot_msgs::KhiGetDIO>& publisher) = 0;
+    virtual void setDIO(const int& cont_no,
+			const khi_robot_msgs::KhiSetDIOConstPtr& msg) = 0;
 
 protected:
     bool in_simulation;

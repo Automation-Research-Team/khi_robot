@@ -75,10 +75,12 @@ public:
     bool writeData( const int& cont_no, const KhiRobotData& data ) override;
     bool updateState( const int& cont_no, const KhiRobotData& data ) override;
     bool getPeriodDiff( const int& cont_no, double& diff ) override;
-    bool commandHandler( khi_robot_msgs::KhiRobotCmd::Request& req, khi_robot_msgs::KhiRobotCmd::Response& res ) override;
+    bool commandHandler( const int& cont_no,
+			 khi_robot_msgs::KhiRobotCmd::Request&  req,
+			 khi_robot_msgs::KhiRobotCmd::Response& res) override;
     void publishDIO( const int& cont_no,
 		     realtime_tools::RealtimePublisher<
-		         khi_robot_msgs::KhiGetDIO>& publisher ) override;
+		         khi_robot_msgs::KhiGetDIO>& publisher) override;
     void setDIO( const int& cont_no,
 		 const khi_robot_msgs::KhiSetDIOConstPtr& msg ) override;
 

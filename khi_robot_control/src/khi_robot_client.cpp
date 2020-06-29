@@ -46,14 +46,18 @@ void KhiCommandService( KhiRobotDriver* driver, const int& cont_no )
     ROS_INFO( "[KhiRobotCommandService] Start" );
 
     ros::AsyncSpinner spinner(boost::thread::hardware_concurrency()-1);
-    ros::NodeHandlePtr node = boost::make_shared<ros::NodeHandle>();
-    ros::ServiceServer service = node->advertiseService(
-				     "khi_robot_command_service",
-				     &KhiRobotDriver::commandHandler, driver);
-    ros::Subscriber setDIO_sub = node->subscribe<khi_robot_msgs::KhiSetDIO>(
-				     "khi_robot_set_dio", 10,
-				     boost::bind(&KhiRobotDriver::setDIO,
-						 driver, cont_no, _1));
+    ros::NodeHandlePtr node = boost::make_shared<ros::NodeHandle>("~");
+    ros::ServiceServer
+	service = node->advertiseService<khi_robot_msgs::KhiRobotCmd::Request,
+					 khi_robot_msgs::KhiRobotCmd::Response>(
+			"khi_robot_command_service",
+			boost::bind(&KhiRobotDriver::commandHandler,
+				    driver, cont_no, _1, _2));
+    ros::Subscriber
+	setDIO_sub = node->subscribe<khi_robot_msgs::KhiSetDIO>(
+			"khi_robot_set_dio", 10,
+			boost::bind(&KhiRobotDriver::setDIO,
+				    driver, cont_no, _1));
     realtime_tools::RealtimePublisher<
 	khi_robot_msgs::KhiGetDIO> getDIO_pub(*node, "khi_robot_dio", 10);
     spinner.start();
