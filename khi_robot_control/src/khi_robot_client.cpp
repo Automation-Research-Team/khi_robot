@@ -36,36 +36,52 @@
 #include <boost/thread/thread.hpp>
 #include <khi_robot_client.h>
 #include <khi_robot_krnx_driver.h>
+#include <khi_robot_driver_plugin.h>
+#include <pluginlib/class_loader.h>
 
 namespace khi_robot_control
 {
 void KhiCommandService( KhiRobotDriver* driver, const int& cont_no )
 {
+    using names_t = std::vector<std::string>;
+
     if ( driver == NULL ) return;
 
     ROS_INFO( "[KhiRobotCommandService] Start" );
 
-    ros::AsyncSpinner spinner(boost::thread::hardware_concurrency()-1);
-    ros::NodeHandlePtr node = boost::make_shared<ros::NodeHandle>("~");
+  // Setup ROS service server.
+    ros::NodeHandlePtr	node = boost::make_shared<ros::NodeHandle>("~");
     ros::ServiceServer
 	service = node->advertiseService<khi_robot_msgs::KhiRobotCmd::Request,
 					 khi_robot_msgs::KhiRobotCmd::Response>(
 			"khi_robot_command_service",
 			boost::bind(&KhiRobotDriver::commandHandler,
 				    driver, cont_no, _1, _2));
-    ros::Subscriber
-	setDIO_sub = node->subscribe<khi_robot_msgs::KhiSetDIO>(
-			"khi_robot_set_dio", 10,
-			boost::bind(&KhiRobotDriver::setDIO,
-				    driver, cont_no, _1));
-    realtime_tools::RealtimePublisher<
-	khi_robot_msgs::KhiGetDIO> getDIO_pub(*node, "khi_robot_dio", 10);
+    ros::AsyncSpinner	spinner(boost::thread::hardware_concurrency() - 1);
     spinner.start();
 
-    for (ros::Rate rate(100.0); ros::ok(); )
+  // Load driver plugins.
+    names_t	plugin_names;
+    node->param<names_t>("plugins", plugin_names, names_t());
+
+    pluginlib::ClassLoader<DriverPlugin>	loader("khi_robot_control",
+						       "DriverPlugin");
+    std::vector<
+	boost::shared_ptr<DriverPlugin> >	plugins;
+    try
     {
-	driver->publishDIO(cont_no, getDIO_pub);
-	rate.sleep();
+	for (const auto& plugin_name : plugin_names)
+	{
+	    plugins.push_back(loader.createInstance(plugin_name));
+	    ROS_INFO("Loaded driver plugin[%s]", plugin_name.c_str());
+
+	    plugins.back()->init(cont_no, driver);
+	    ROS_INFO("Initialized driver plugin[%s]", plugin_name.c_str());
+	}
+    }
+    catch (const pluginlib::PluginlibException& err)
+    {
+	ROS_ERROR("Failed to load/initalize driver plugin: %s", err.what());
     }
 
     ros::waitForShutdown();

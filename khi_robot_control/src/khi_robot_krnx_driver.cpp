@@ -1112,58 +1112,39 @@ bool KhiRobotKrnxDriver::commandHandler( const int& cont_no, khi_robot_msgs::Khi
     return true;
 }
 
-void
-KhiRobotKrnxDriver::publishDIO(const int& cont_no,
-			       realtime_tools::RealtimePublisher<
-			           khi_robot_msgs::KhiGetDIO>& publisher)
+bool
+KhiRobotKrnxDriver::getDIO(const int& cont_no, uint8_t* in, uint8_t* out)
 {
-    TKrnxIoInfo io;
-    int		dcode = KRNX_NOERROR;
+    std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
 
-    {
-	std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
-	dcode = krnx_GetCurIoInfo(cont_no, &io);
-    }
+    TKrnxIoInfo io;
+    const auto	dcode = krnx_GetCurIoInfo(cont_no, &io);
 
     if (dcode != KRNX_NOERROR)
     {
       //ROS_WARN("Failed to get current IO info(%x)", -dcode);
-	return;
+	return false;
     }
 
-    if (publisher.trylock())
-    {
-	std::copy(std::begin(io.io_do), std::end(io.io_do),
-		  std::begin(publisher.msg_.out));
-	std::copy(std::begin(io.io_di), std::end(io.io_di),
-		  std::begin(publisher.msg_.in));
-	std::copy(std::begin(io.internal), std::end(io.internal),
-		  std::begin(publisher.msg_.internal));
+    std::copy(std::begin(io.io_di), std::end(io.io_di), in);
+    std::copy(std::begin(io.io_do), std::end(io.io_do), out);
 
-	publisher.unlockAndPublish();
-    }
+    return true;
 }
 
 void
 KhiRobotKrnxDriver::setDIO(const int& cont_no,
-			   const khi_robot_msgs::KhiSetDIOConstPtr& msg)
+			   const uint8_t* out, const uint8_t* mask)
 {
-    const auto	IoSet = (msg->din ? krnx_IoSetDI : krnx_IoSetDO);
-    int		dcode = KRNX_NOERROR;
+    std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
 
-    {
-	std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
-	dcode = IoSet(cont_no,
-		      reinterpret_cast<const char*>(msg->data.data()),
-		      reinterpret_cast<const char*>(msg->mask.data()),
-		      msg->data.size());
-    }
+    const auto	dcode = krnx_IoSetDO(cont_no,
+				     reinterpret_cast<const char*>(out),
+				     reinterpret_cast<const char*>(mask),
+				     KRNX_MAXSIGNAL/8);
 
     if (dcode != KRNX_NOERROR)
-    {
 	ROS_ERROR("Failed to set DIO (%x)", -dcode);
-	return;
-    }
 }
 
 } // end of khi_robot_control namespace

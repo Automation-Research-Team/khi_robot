@@ -10,12 +10,15 @@ find_package(catkin REQUIRED
     khi_robot_msgs
     realtime_tools
     trajectory_msgs
-    transmission_interface)
+    transmission_interface
+    pluginlib)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
+  INCLUDE_DIRS
+    include
   CATKIN_DEPENDS
     diagnostic_updater
     khi_robot_msgs

@@ -36,10 +36,7 @@
 #define KHI_ROBOT_DRIVER_H
 
 #include <string>
-#include <realtime_tools/realtime_publisher.h>
 #include <khi_robot_msgs/KhiRobotCmd.h>
-#include <khi_robot_msgs/KhiGetDIO.h>
-#include <khi_robot_msgs/KhiSetDIO.h>
 
 namespace khi_robot_control
 {
@@ -305,11 +302,9 @@ public:
     virtual bool commandHandler(const int& cont_no,
 				khi_robot_msgs::KhiRobotCmd::Request& req,
 				khi_robot_msgs::KhiRobotCmd::Response& res) = 0;
-    virtual void publishDIO(const int& cont_no,
-			    realtime_tools::RealtimePublisher<
-			        khi_robot_msgs::KhiGetDIO>& publisher) = 0;
+    virtual bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) = 0;
     virtual void setDIO(const int& cont_no,
-			const khi_robot_msgs::KhiSetDIOConstPtr& msg) = 0;
+			const uint8_t* out, const uint8_t* mask) = 0;
 
 protected:
     bool in_simulation;

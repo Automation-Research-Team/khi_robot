@@ -78,11 +78,9 @@ public:
     bool commandHandler( const int& cont_no,
 			 khi_robot_msgs::KhiRobotCmd::Request&  req,
 			 khi_robot_msgs::KhiRobotCmd::Response& res) override;
-    void publishDIO( const int& cont_no,
-		     realtime_tools::RealtimePublisher<
-		         khi_robot_msgs::KhiGetDIO>& publisher) override;
-    void setDIO( const int& cont_no,
-		 const khi_robot_msgs::KhiSetDIOConstPtr& msg ) override;
+    bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) override;
+    void setDIO(const int& cont_no,
+		const uint8_t* out, const uint8_t* mask) override;
 
 private:
     /* general */
