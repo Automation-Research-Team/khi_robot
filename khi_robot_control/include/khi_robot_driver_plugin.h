@@ -26,16 +26,18 @@ class DriverPlugin
     void		clear()						;
     bool		read()						;
     void		write()					const	;
+    uint16_t		in(int offfset)				const	;
+    uint16_t		out(int offfset)			const	;
+    uint16_t*		outp(int offfset)				;
+    uint16_t*		maskp(int offfset)				;
 
   private:
     virtual void	onInit()					= 0;
-
-  protected:
-    dio_t		_in, _out, _mask;
-
+    
   private:
     int			_cont_no;
     KhiRobotDriver*	_driver;
+    dio_t		_in, _out, _mask;
 };
 
 inline void
@@ -66,5 +68,29 @@ DriverPlugin::write() const
     _driver->setDIO(_cont_no, _out.data(), _mask.data());
 }
 
+inline uint16_t
+DriverPlugin::in(int offset) const
+{
+    return *reinterpret_cast<const uint16_t*>(_in.data() + offset);
+}
+    
+inline uint16_t
+DriverPlugin::out(int offset) const
+{
+    return *reinterpret_cast<const uint16_t*>(_out.data() + offset);
+}
+    
+inline uint16_t*
+DriverPlugin::outp(int offset)
+{
+    return reinterpret_cast<uint16_t*>(_out.data() + offset);
+}
+    
+inline uint16_t*
+DriverPlugin::maskp(int offset)
+{
+    return reinterpret_cast<uint16_t*>(_mask.data() + offset);
+}
+    
 }	// namespace khi_robot_control
 #endif	// !KHI_ROBOT_CONTROL_PLUGIN_H
