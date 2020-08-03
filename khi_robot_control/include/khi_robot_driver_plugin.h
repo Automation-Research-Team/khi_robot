@@ -20,16 +20,20 @@ class DriverPlugin
     using dio_t	= std::array<uint8_t, 64>;
 
   public:
-    void		init(int cont_no, KhiRobotDriver* driver)	;
+    void	init(int cont_no, KhiRobotDriver* driver)		;
 
   protected:
-    void		clear()						;
-    bool		read()						;
-    void		write()					const	;
-    uint16_t		in(int offfset)				const	;
-    uint16_t		out(int offfset)			const	;
-    uint16_t*		outp(int offfset)				;
-    uint16_t*		maskp(int offfset)				;
+    void	clear()							;
+    bool	read()							;
+    void	write()						const	;
+    template <class T>
+    T		in(int offfset)					const	;
+    template <class T>
+    T		out(int offfset)				const	;
+    template <class T>
+    void	set_out(int offfset, T val)				;
+    template <class T>
+    void	clear_mask(int offfset)					;
 
   private:
     virtual void	onInit()					= 0;
@@ -68,28 +72,29 @@ DriverPlugin::write() const
     _driver->setDIO(_cont_no, _out.data(), _mask.data());
 }
 
-inline uint16_t
+template <class T> inline T
 DriverPlugin::in(int offset) const
 {
-    return *reinterpret_cast<const uint16_t*>(_in.data() + offset);
+    return *reinterpret_cast<const T*>(_in.data() + offset);
 }
     
-inline uint16_t
+template <class T> inline T
 DriverPlugin::out(int offset) const
 {
-    return *reinterpret_cast<const uint16_t*>(_out.data() + offset);
+    return *reinterpret_cast<const T*>(_out.data() + offset);
 }
     
-inline uint16_t*
-DriverPlugin::outp(int offset)
+template <class T> void
+DriverPlugin::set_out(int offset, T val)
 {
-    return reinterpret_cast<uint16_t*>(_out.data() + offset);
+    *reinterpret_cast<T*>(_out.data()  + offset) = val;
+    *reinterpret_cast<T*>(_mask.data() + offset) = T(~0);
 }
     
-inline uint16_t*
-DriverPlugin::maskp(int offset)
+template <class T> void
+DriverPlugin::clear_mask(int offset)
 {
-    return reinterpret_cast<uint16_t*>(_mask.data() + offset);
+    *reinterpret_cast<T*>(_mask.data() + offset) = T(0);
 }
     
 }	// namespace khi_robot_control

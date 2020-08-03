@@ -1091,6 +1091,14 @@ bool KhiRobotKrnxDriver::commandHandler( const int& cont_no, khi_robot_msgs::Khi
                     res.driver_ret = dcode;
                     res.as_ret = acode;
 		}
+		else if ( api_cmd == "set_bits32" )
+		{
+                    std::string as_cmd = req.cmd;
+                    as_cmd.replace( 0, strlen("set_bits32"), "BITS32" );
+                    dcode = execAsMonCmd( cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode );
+                    res.driver_ret = dcode;
+                    res.as_ret = acode;
+		}
                 else
                 {
                     res.driver_ret = KRNX_E_BADARGS;
@@ -1123,7 +1131,7 @@ KhiRobotKrnxDriver::getDIO(const int& cont_no, uint8_t* in, uint8_t* out)
 
     if (dcode != KRNX_NOERROR)
     {
-      //ROS_WARN("Failed to get current IO info(%x)", -dcode);
+      //ROS_WARN("Failed to get current IO info(-0x%x)", -dcode);
 	return false;
     }
 
@@ -1145,7 +1153,7 @@ KhiRobotKrnxDriver::setDIO(const int& cont_no,
 				     KRNX_MAXSIGNAL/8);
 
     if (dcode != KRNX_NOERROR)
-	ROS_ERROR("Failed to set DIO (%x)", -dcode);
+	ROS_ERROR("Failed to set DIO (-0x%x)", -dcode);
 }
 
 } // end of khi_robot_control namespace
