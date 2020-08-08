@@ -303,8 +303,8 @@ public:
 				khi_robot_msgs::KhiRobotCmd::Request& req,
 				khi_robot_msgs::KhiRobotCmd::Response& res) = 0;
     virtual bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) = 0;
-    virtual void setDIO(const int& cont_no,
-			const uint8_t* out, const uint8_t* mask) = 0;
+    virtual void setDO(const int& cont_no,
+		       const uint8_t* out, const uint8_t* mask) = 0;
 
 protected:
     bool in_simulation;

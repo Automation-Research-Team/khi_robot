@@ -1142,8 +1142,8 @@ KhiRobotKrnxDriver::getDIO(const int& cont_no, uint8_t* in, uint8_t* out)
 }
 
 void
-KhiRobotKrnxDriver::setDIO(const int& cont_no,
-			   const uint8_t* out, const uint8_t* mask)
+KhiRobotKrnxDriver::setDO(const int& cont_no,
+			  const uint8_t* out, const uint8_t* mask)
 {
     std::lock_guard<std::mutex> lock(mutex_state[cont_no]);
 
