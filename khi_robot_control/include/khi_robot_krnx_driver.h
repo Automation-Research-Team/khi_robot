@@ -81,6 +81,8 @@ public:
     bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) override;
     void setDO(const int& cont_no,
 	       const uint8_t* out, const uint8_t* mask) override;
+    void set_bits(const int& cont_no, int sig, int nsigs, int val) override;
+    void pulse(const int& cont_no, int sig, double sec) override;
 
 private:
     /* general */

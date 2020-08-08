@@ -37,6 +37,8 @@ class DriverPlugin
     void	set_out(int offfset, T val, T mask=~0)			;
     template <class T>
     void	clear_mask(int offfset)					;
+    void	set_bits(int sig, int nsigs, int val)		const	;
+    void	pulse(int sig, double sec=0.2)			const	;
 
   private:
     virtual void	onInit()					= 0;
@@ -107,6 +109,18 @@ template <class T> inline void
 DriverPlugin::clear_mask(int offset)
 {
     *reinterpret_cast<T*>(_mask.data() + offset) = T(0);
+}
+
+inline void
+DriverPlugin::set_bits(int sig, int nsigs, int val) const
+{
+    _driver->set_bits(_cont_no, sig, nsigs, val);
+}
+
+inline void
+DriverPlugin::pulse(int sig, double sec) const
+{
+    _driver->pulse(_cont_no, sig, sec);
 }
 
 }	// namespace khi_robot_control

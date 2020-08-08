@@ -1153,7 +1153,39 @@ KhiRobotKrnxDriver::setDO(const int& cont_no,
 				     KRNX_MAXSIGNAL/8);
 
     if (dcode != KRNX_NOERROR)
-	ROS_ERROR("Failed to set DIO (-0x%x)", -dcode);
+	ROS_ERROR("Failed to set DO (-0x%x)", -dcode);
+}
+
+void
+KhiRobotKrnxDriver::set_bits(const int& cont_no, int sig, int nsigs, int val)
+{
+    const auto	as_cmd = "BITS " + std::to_string(sig) + ','
+		       + std::to_string(nsigs) + '=' + std::to_string(val);
+    char	resp[KRNX_MSGSIZE] = { 0 };
+    int		acode;
+    const auto	dcode = execAsMonCmd(cont_no, as_cmd.c_str(),
+				     resp, sizeof(resp), &acode);
+
+    if (dcode != KRNX_NOERROR)
+	ROS_ERROR("Failed to set bits (dcode = -0x%x)", -dcode);
+    if (acode != 0)
+	ROS_ERROR("Failed to set bits (acode = %d)", acode);
+}
+
+void
+KhiRobotKrnxDriver::pulse(const int& cont_no, int sig, double sec)
+{
+    const auto	as_cmd = "PULSE " + std::to_string(sig) + ','
+		       + std::to_string(sec);
+    char	resp[KRNX_MSGSIZE] = { 0 };
+    int		acode;
+    const auto	dcode = execAsMonCmd(cont_no, as_cmd.c_str(),
+				     resp, sizeof(resp), &acode);
+
+    if (dcode != KRNX_NOERROR)
+	ROS_ERROR("Failed to pulse (dcode = -0x%x)", -dcode);
+    if (acode != 0)
+	ROS_ERROR("Failed to pulse (acode = %d)", acode);
 }
 
 } // end of khi_robot_control namespace

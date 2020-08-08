@@ -305,6 +305,8 @@ public:
     virtual bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) = 0;
     virtual void setDO(const int& cont_no,
 		       const uint8_t* out, const uint8_t* mask) = 0;
+    virtual void set_bits(const int& cont_no, int sig, int nsigs, int val) = 0;
+    virtual void pulse(const int& cont_no, int sig, double sec) = 0;
 
 protected:
     bool in_simulation;
