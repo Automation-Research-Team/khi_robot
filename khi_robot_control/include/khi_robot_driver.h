@@ -303,10 +303,12 @@ public:
 				khi_robot_msgs::KhiRobotCmd::Request& req,
 				khi_robot_msgs::KhiRobotCmd::Response& res) = 0;
     virtual bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) = 0;
-    virtual void setDO(const int& cont_no,
+    virtual bool setDO(const int& cont_no,
 		       const uint8_t* out, const uint8_t* mask) = 0;
-    virtual void set_bits(const int& cont_no, int sig, int nsigs, int val) = 0;
-    virtual void pulse(const int& cont_no, int sig, double sec) = 0;
+    virtual bool set_bits(const int& cont_no, int sig, int nsigs, int val) = 0;
+    virtual bool pulse(const int& cont_no, int sig, double sec) = 0;
+    virtual bool set_variable(const int& cont_no,
+			      const std::string& name, int value) = 0;
 
 protected:
     bool in_simulation;

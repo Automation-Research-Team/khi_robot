@@ -27,19 +27,21 @@ class DriverPlugin
   protected:
     void	clear()							;
     bool	read()							;
-    void	write()						const	;
-    void	pulse(double sec=0.2)					;
+    bool	write()						 const	;
+    bool	pulse(double sec=0.2)					;
     template <class T>
-    T		in(int offfset)					const	;
+    T		in(int offfset)					 const	;
     template <class T>
-    T		out(int offfset)				const	;
+    T		out(int offfset)				 const	;
     template <class T>
     void	set_out(int offfset, T val, T mask=~0)			;
     template <class T>
     void	clear_mask(int offfset)					;
-    void	set_bits(int sig, int nsigs, int val)		const	;
-    void	pulse(int sig, double sec=0.2)			const	;
-
+    bool	set_signal(int sig, bool enable)		 const	;
+    bool	set_bits(int sig, int nsigs, int val)		 const	;
+    bool	pulse(int sig, double sec=0.2)			 const	;
+    bool	set_variable(const std::string& name, int value) const	;
+    
   private:
     virtual void	onInit()					= 0;
 
@@ -71,19 +73,22 @@ DriverPlugin::read()
     return _driver->getDIO(_cont_no, _in.data(), _out.data());
 }
 
-inline void
+inline bool
 DriverPlugin::write() const
 {
-    _driver->setDO(_cont_no, _out.data(), _mask.data());
+    return _driver->setDO(_cont_no, _out.data(), _mask.data());
 }
 
-inline void
+inline bool
 DriverPlugin::pulse(double sec)
 {
-    write();
+    if (!write())
+	return false;
+    
     ros::Duration(sec).sleep();
     std::fill(std::begin(_out), std::end(_out), 0);
-    write();
+
+    return write();
 }
 
 template <class T> inline T
@@ -111,16 +116,28 @@ DriverPlugin::clear_mask(int offset)
     *reinterpret_cast<T*>(_mask.data() + offset) = T(0);
 }
 
-inline void
-DriverPlugin::set_bits(int sig, int nsigs, int val) const
+inline bool
+DriverPlugin::set_signal(int sig, bool enable) const
 {
-    _driver->set_bits(_cont_no, sig, nsigs, val);
+    return _driver->set_bits(_cont_no, sig, 1, (enable ? 1 : 0));
 }
 
-inline void
+inline bool
+DriverPlugin::set_bits(int sig, int nsigs, int val) const
+{
+    return _driver->set_bits(_cont_no, sig, nsigs, val);
+}
+
+inline bool
 DriverPlugin::pulse(int sig, double sec) const
 {
-    _driver->pulse(_cont_no, sig, sec);
+    return _driver->pulse(_cont_no, sig, sec);
+}
+
+inline bool
+DriverPlugin::set_variable(const std::string& name, int value) const
+{
+    return _driver->set_variable(_cont_no, name, value);
 }
 
 }	// namespace khi_robot_control
