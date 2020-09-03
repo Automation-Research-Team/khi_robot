@@ -1189,4 +1189,16 @@ KhiRobotKrnxDriver::set_variable(const int& cont_no,
 	    == KRNX_NOERROR);
 }
 
+bool
+KhiRobotKrnxDriver::pcexecute(const int& cont_no,
+			      const std::string& progname, int prognum)
+{
+    const auto	as_cmd = "PCEXECUTE " + std::to_string(prognum)
+		       + ": " + progname;
+    char	resp[KRNX_MSGSIZE] = { 0 };
+    int		acode;
+    return (execAsMonCmd(cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode)
+	    == KRNX_NOERROR);
+}
+
 } // end of khi_robot_control namespace

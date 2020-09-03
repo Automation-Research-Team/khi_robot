@@ -309,6 +309,8 @@ public:
     virtual bool pulse(const int& cont_no, int sig, double sec) = 0;
     virtual bool set_variable(const int& cont_no,
 			      const std::string& name, int value) = 0;
+    virtual bool pcexecute(const int& cont_no,
+			   const std::string& progname, int prognum) = 0;
 
 protected:
     bool in_simulation;

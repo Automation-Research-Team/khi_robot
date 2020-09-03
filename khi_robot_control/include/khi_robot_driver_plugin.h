@@ -41,6 +41,8 @@ class DriverPlugin
     bool	set_bits(int sig, int nsigs, int val)		 const	;
     bool	pulse(int sig, double sec=0.2)			 const	;
     bool	set_variable(const std::string& name, int value) const	;
+    bool	pcexecute(const std::string& progname,
+			  int prognum)				 const	;
     
   private:
     virtual void	onInit()					= 0;
@@ -138,6 +140,12 @@ inline bool
 DriverPlugin::set_variable(const std::string& name, int value) const
 {
     return _driver->set_variable(_cont_no, name, value);
+}
+
+inline bool
+DriverPlugin::pcexecute(const std::string& progname, int prognum) const
+{
+    return _driver->set_variable(_cont_no, progname, prognum);
 }
 
 }	// namespace khi_robot_control

@@ -85,6 +85,8 @@ public:
     bool pulse(const int& cont_no, int sig, double sec) override;
     bool set_variable(const int& cont_no,
 		      const std::string& name, int value) override;
+    bool pcexecute(const int& cont_no,
+		   const std::string& progname, int prognum) override;
     
 private:
     /* general */
