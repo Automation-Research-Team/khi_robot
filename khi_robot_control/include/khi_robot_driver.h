@@ -305,12 +305,7 @@ public:
     virtual bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) = 0;
     virtual bool setDO(const int& cont_no,
 		       const uint8_t* out, const uint8_t* mask) = 0;
-    virtual bool set_bits(const int& cont_no, int sig, int nsigs, int val) = 0;
-    virtual bool pulse(const int& cont_no, int sig, double sec) = 0;
-    virtual bool set_variable(const int& cont_no,
-			      const std::string& name, int value) = 0;
-    virtual bool pcexecute(const int& cont_no,
-			   const std::string& progname, int prognum) = 0;
+    virtual bool exec_as(const int& cont_no, const std::string& as_cmd) = 0;
 
 protected:
     bool in_simulation;

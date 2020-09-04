@@ -81,12 +81,7 @@ public:
     bool getDIO(const int& cont_no, uint8_t* in, uint8_t* out) override;
     bool setDO(const int& cont_no,
 	       const uint8_t* out, const uint8_t* mask) override;
-    bool set_bits(const int& cont_no, int sig, int nsigs, int val) override;
-    bool pulse(const int& cont_no, int sig, double sec) override;
-    bool set_variable(const int& cont_no,
-		      const std::string& name, int value) override;
-    bool pcexecute(const int& cont_no,
-		   const std::string& progname, int prognum) override;
+    bool exec_as(const int& cont_no, const std::string& as_cmd) override;
     
 private:
     /* general */

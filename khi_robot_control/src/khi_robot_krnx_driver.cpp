@@ -1157,44 +1157,8 @@ KhiRobotKrnxDriver::setDO(const int& cont_no,
 }
 
 bool
-KhiRobotKrnxDriver::set_bits(const int& cont_no, int sig, int nsigs, int val)
+KhiRobotKrnxDriver::exec_as(const int& cont_no, const std::string& as_cmd)
 {
-    const auto	as_cmd = "BITS32 " + std::to_string(sig) + ','
-		       + std::to_string(nsigs) + '=' + std::to_string(val);
-    char	resp[KRNX_MSGSIZE] = { 0 };
-    int		acode;
-    return (execAsMonCmd(cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode)
-	    == KRNX_NOERROR);
-}
-
-bool
-KhiRobotKrnxDriver::pulse(const int& cont_no, int sig, double sec)
-{
-    const auto	as_cmd = "PULSE " + std::to_string(sig) + ','
-		       + std::to_string(sec);
-    char	resp[KRNX_MSGSIZE] = { 0 };
-    int		acode;
-    return (execAsMonCmd(cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode)
-	    == KRNX_NOERROR);
-}
-
-bool
-KhiRobotKrnxDriver::set_variable(const int& cont_no,
-				 const std::string& name, int value)
-{
-    const auto	as_cmd = name + '=' + std::to_string(value);
-    char	resp[KRNX_MSGSIZE] = { 0 };
-    int		acode;
-    return (execAsMonCmd(cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode)
-	    == KRNX_NOERROR);
-}
-
-bool
-KhiRobotKrnxDriver::pcexecute(const int& cont_no,
-			      const std::string& progname, int prognum)
-{
-    const auto	as_cmd = "PCEXECUTE " + std::to_string(prognum)
-		       + ": " + progname;
     char	resp[KRNX_MSGSIZE] = { 0 };
     int		acode;
     return (execAsMonCmd(cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode)

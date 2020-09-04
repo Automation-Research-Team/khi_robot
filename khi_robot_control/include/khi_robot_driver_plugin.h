@@ -41,8 +41,7 @@ class DriverPlugin
     bool	set_bits(int sig, int nsigs, int val)		 const	;
     bool	pulse(int sig, double sec=0.2)			 const	;
     bool	set_variable(const std::string& name, int value) const	;
-    bool	pcexecute(const std::string& progname,
-			  int prognum)				 const	;
+    bool	exec_as(const std::string& as_cmd)		 const	;
     
   private:
     virtual void	onInit()					= 0;
@@ -121,31 +120,33 @@ DriverPlugin::clear_mask(int offset)
 inline bool
 DriverPlugin::set_signal(int sig, bool enable) const
 {
-    return _driver->set_bits(_cont_no, sig, 1, (enable ? 1 : 0));
+    return set_bits(sig, 1, (enable ? 1 : 0));
 }
 
 inline bool
 DriverPlugin::set_bits(int sig, int nsigs, int val) const
 {
-    return _driver->set_bits(_cont_no, sig, nsigs, val);
+    return exec_as("BITS32 " + std::to_string(sig) + ',' +
+		   std::to_string(nsigs) + '=' + std::to_string(val));
 }
 
 inline bool
 DriverPlugin::pulse(int sig, double sec) const
 {
-    return _driver->pulse(_cont_no, sig, sec);
+    return exec_as("PULSE " + std::to_string(sig) + ',' + std::to_string(sec));
 }
 
 inline bool
 DriverPlugin::set_variable(const std::string& name, int value) const
 {
-    return _driver->set_variable(_cont_no, name, value);
+    return exec_as(name + '=' + std::to_string(value));
+
 }
 
 inline bool
-DriverPlugin::pcexecute(const std::string& progname, int prognum) const
+DriverPlugin::exec_as(const std::string& as_cmd) const
 {
-    return _driver->set_variable(_cont_no, progname, prognum);
+    return _driver->exec_as(_cont_no, as_cmd);
 }
 
 }	// namespace khi_robot_control
