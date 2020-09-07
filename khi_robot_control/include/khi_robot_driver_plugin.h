@@ -42,6 +42,7 @@ class DriverPlugin
     bool	pulse(int sig, double sec=0.2)			 const	;
     bool	set_variable(const std::string& name, int value) const	;
     bool	exec_as(const std::string& as_cmd)		 const	;
+    bool	set_state_trigger(KhiRobotStateTrigger trigger)	 const	;
     
   private:
     virtual void	onInit()					= 0;
@@ -147,6 +148,12 @@ inline bool
 DriverPlugin::exec_as(const std::string& as_cmd) const
 {
     return _driver->exec_as(_cont_no, as_cmd);
+}
+
+inline bool
+DriverPlugin::set_state_trigger(KhiRobotStateTrigger trigger) const
+{
+    return _driver->set_state_trigger(_cont_no, trigger);
 }
 
 }	// namespace khi_robot_control

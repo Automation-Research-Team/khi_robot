@@ -1161,8 +1161,52 @@ KhiRobotKrnxDriver::exec_as(const int& cont_no, const std::string& as_cmd)
 {
     char	resp[KRNX_MSGSIZE] = { 0 };
     int		acode;
-    return (execAsMonCmd(cont_no, as_cmd.c_str(), resp, sizeof(resp), &acode)
-	    == KRNX_NOERROR);
+    const auto	dcode = execAsMonCmd(cont_no, as_cmd.c_str(),
+				     resp, sizeof(resp), &acode);
+    if (dcode != KRNX_NOERROR)
+    {
+	ROS_ERROR("exec_as(): %s", resp);
+	return false;
+    }
+
+    return true;
+}
+
+bool
+KhiRobotKrnxDriver::set_state_trigger(const int& cont_no,
+				      KhiRobotStateTrigger trigger)
+{
+    const auto	state = getState(cont_no);
+
+    switch (trigger)
+    {
+      case HOLD:
+	if (state != ACTIVE)
+	{
+	    ROS_WARN("NOT ACTIVE STATE");
+	    return false;
+	}
+	break;
+
+      case RESTART:
+	if ((state != INACTIVE) && (state != HOLDED) && (state != ERROR))
+	{
+	    ROS_WARN("NOT INACTIVE/HOLDED/ERROR STATE");
+	    return false;
+	}
+	break;
+
+      case QUIT:
+	break;
+
+      default:
+	ROS_ERROR("Unknown state trigger");
+	return false;
+    }
+
+    setStateTrigger(cont_no, state);
+
+    return true;
 }
 
 } // end of khi_robot_control namespace

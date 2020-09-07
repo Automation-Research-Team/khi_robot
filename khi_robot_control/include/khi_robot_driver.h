@@ -306,6 +306,8 @@ public:
     virtual bool setDO(const int& cont_no,
 		       const uint8_t* out, const uint8_t* mask) = 0;
     virtual bool exec_as(const int& cont_no, const std::string& as_cmd) = 0;
+    virtual bool set_state_trigger(const int& cont_no,
+				   KhiRobotStateTrigger trigger) = 0;
 
 protected:
     bool in_simulation;

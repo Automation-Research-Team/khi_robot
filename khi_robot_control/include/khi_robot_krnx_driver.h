@@ -82,6 +82,8 @@ public:
     bool setDO(const int& cont_no,
 	       const uint8_t* out, const uint8_t* mask) override;
     bool exec_as(const int& cont_no, const std::string& as_cmd) override;
+    bool set_state_trigger(const int& cont_no,
+			   KhiRobotStateTrigger trigger) override;
     
 private:
     /* general */
