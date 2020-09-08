@@ -2,8 +2,8 @@
   \file		khi_robot_control_plugin.h
   \author	Toshio UESHIBA
 */
-#ifndef KHI_ROBOT_CONTROL_PLUGIN_H
-#define KHI_ROBOT_CONTROL_PLUGIN_H
+#ifndef KHI_ROBOT_DRIVER_PLUGIN_H
+#define KHI_ROBOT_DRIVER_PLUGIN_H
 
 #include <cstdint>
 #include <array>
@@ -30,19 +30,20 @@ class DriverPlugin
     bool	write()						 const	;
     bool	pulse(double sec=0.2)					;
     template <class T>
-    T		in(int offfset)					 const	;
+    T		in(int offset)					 const	;
     template <class T>
-    T		out(int offfset)				 const	;
+    T		out(int offset)					 const	;
     template <class T>
-    void	set_out(int offfset, T val, T mask=~0)			;
+    void	set_out(int offset, T val, T mask=~0)			;
     template <class T>
-    void	clear_mask(int offfset)					;
+    void	clear_mask(int offset)					;
     bool	set_signal(int sig, bool enable)		 const	;
     bool	set_bits(int sig, int nsigs, int val)		 const	;
     bool	pulse(int sig, double sec=0.2)			 const	;
     bool	set_variable(const std::string& name, int value) const	;
     bool	exec_as(const std::string& as_cmd)		 const	;
     bool	set_state_trigger(KhiRobotStateTrigger trigger)	 const	;
+    int		get_state()					 const	;
     
   private:
     virtual void	onInit()					= 0;
@@ -156,5 +157,11 @@ DriverPlugin::set_state_trigger(KhiRobotStateTrigger trigger) const
     return _driver->set_state_trigger(_cont_no, trigger);
 }
 
+inline int
+DriverPlugin::get_state() const
+{
+    return _driver->getState(_cont_no);
+}
+    
 }	// namespace khi_robot_control
-#endif	// !KHI_ROBOT_CONTROL_PLUGIN_H
+#endif	// !KHI_ROBOT_DRIVER_PLUGIN_H
