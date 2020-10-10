@@ -48,7 +48,7 @@ KhiRobotHardwareInterface::~KhiRobotHardwareInterface()
     close();
 }
 
-bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::string& ip_address, const double& period, const bool in_simulation )
+bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::string& ip_address, const double& period, const std::string& rtcprog, const bool in_simulation )
 {
     ros::NodeHandle nh_joints;
     std::vector<std::string> controller_names, joint_names;
@@ -111,7 +111,7 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
 
     /* start KhiRobotClient */
     client = new KhiRobotClient();
-    return client->open( ip_address, period, data, in_simulation );
+    return client->open( ip_address, period, data, rtcprog, in_simulation );
 }
 
 bool KhiRobotHardwareInterface::activate()

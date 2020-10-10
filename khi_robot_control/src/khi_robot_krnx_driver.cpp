@@ -175,7 +175,7 @@ bool KhiRobotKrnxDriver::initialize( const int& cont_no, const double& period, K
     return true;
 }
 
-bool KhiRobotKrnxDriver::open( const int& cont_no, const std::string& ip_address, KhiRobotData& data )
+bool KhiRobotKrnxDriver::open( const int& cont_no, const std::string& ip_address, KhiRobotData& data, const std::string& rtcprog )
 {
     char c_ip_address[64] = { 0 };
 
@@ -202,7 +202,7 @@ bool KhiRobotKrnxDriver::open( const int& cont_no, const std::string& ip_address
     if ( return_code == cont_no )
     {
         cont_info[cont_no].ip_address = ip_address;
-        if ( !loadDriverParam( cont_no, data ) ) { return false; };
+        if ( !loadDriverParam( cont_no, data, rtcprog ) ) { return false; };
 
         setState( cont_no, INACTIVE );
         return true;
@@ -443,7 +443,7 @@ bool KhiRobotKrnxDriver::deactivate( const int& cont_no, const KhiRobotData& dat
     return true;
 }
 
-bool KhiRobotKrnxDriver::loadDriverParam( const int& cont_no, KhiRobotData& data )
+bool KhiRobotKrnxDriver::loadDriverParam( const int& cont_no, KhiRobotData& data, const std::string& rtcprog )
 {
     char robot_name[64] = { 0 };
     char msg[256] = { 0 };
@@ -513,7 +513,7 @@ bool KhiRobotKrnxDriver::loadDriverParam( const int& cont_no, KhiRobotData& data
         if ( !retKrnxRes( cont_no, "krnx_Kill", return_code ) ) { return false; }
 
         /* Load Program */
-        if ( !loadRtcProg( cont_no, data.robot_name.c_str() ) )
+        if ( !loadRtcProg( cont_no, data.robot_name, rtcprog ) )
         {
             errorPrint( "Failed to load RTC program");
             return false;
@@ -830,7 +830,7 @@ std::vector<std::string> KhiRobotKrnxDriver::splitString( const std::string& str
     return list;
 }
 
-bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& name )
+bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& name, const std::string& rtcprog )
 {
     FILE* fp;
     int fd;
@@ -849,51 +849,67 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
         if ( rsize < 0 ) { return false; }
 
         /* RTC program */
-        if ( name == KHI_ROBOT_WD002N )
-        {
-            fprintf( fp, ".PROGRAM rb_rtc1()\n" );
-            fprintf( fp, "  FOR .i = 1 TO 8\n" );
-            fprintf( fp, "    .acc[.i] = 1\n" );
-            fprintf( fp, "  END\n" );
-            fprintf( fp, "  L3ACCURACY .acc[1] ALWAYS\n" );
-            fprintf( fp, "  FOR .i = 1 TO 8\n" );
-            fprintf( fp, "    .acc[.i] = 0\n" );
-            fprintf( fp, "  END\n" );
-            fprintf( fp, "  RTC_SW 1: ON\n" );
-            fprintf( fp, "1 JMOVE #rtchome1\n" );
-            fprintf( fp, "  GOTO 1\n" );
-            fprintf( fp, "  RTC_SW 1: OFF\n" );
-            fprintf( fp, ".END\n" );
-            fprintf( fp, ".PROGRAM rb_rtc2()\n" );
-            fprintf( fp, "  FOR .i = 1 TO 8\n" );
-            fprintf( fp, "    .acc[.i] = 1\n" );
-            fprintf( fp, "  END\n" );
-            fprintf( fp, "  L3ACCURACY .acc[1] ALWAYS\n" );
-            fprintf( fp, "  FOR .i = 1 TO 8\n" );
-            fprintf( fp, "    .acc[.i] = 0\n" );
-            fprintf( fp, "  END\n" );
-            fprintf( fp, "  RTC_SW 2: ON\n" );
-            fprintf( fp, "1 JMOVE #rtchome2\n" );
-            fprintf( fp, "  GOTO 1\n" );
-            fprintf( fp, "  RTC_SW 2: OFF\n" );
-            fprintf( fp, ".END\n" );
-        }
-        else
-        {
-            fprintf( fp, ".PROGRAM rb_rtc1()\n" );
-            fprintf( fp, "  GROUP -1\n" );
-            fprintf( fp, "  ACCURACY 1 FINE\n" );
-            fprintf( fp, "  JMOVE #rtchome1\n" );
-            fprintf( fp, "  ACCURACY 0 ALWAYS\n" );
-            fprintf( fp, "  RTC_SW 1: ON\n" );
-	    fprintf( fp, "1 SWAIT 388\n" );
-	    fprintf( fp, "  JMOVE #rtchome1\n" );
-	  //fprintf( fp, "1 JMOVE #rtchome1\n" );
-            fprintf( fp, "  GOTO 1\n" );
-            fprintf( fp, "  RTC_SW 1: OFF\n" );
-            fprintf( fp, ".END\n" );
-        }
-        fclose( fp );
+	if ( rtcprog == "")
+	{
+	    if ( name == KHI_ROBOT_WD002N )
+	    {
+		fprintf( fp, ".PROGRAM rb_rtc1()\n" );
+		fprintf( fp, "  FOR .i = 1 TO 8\n" );
+		fprintf( fp, "    .acc[.i] = 1\n" );
+		fprintf( fp, "  END\n" );
+		fprintf( fp, "  L3ACCURACY .acc[1] ALWAYS\n" );
+		fprintf( fp, "  FOR .i = 1 TO 8\n" );
+		fprintf( fp, "    .acc[.i] = 0\n" );
+		fprintf( fp, "  END\n" );
+		fprintf( fp, "  RTC_SW 1: ON\n" );
+		fprintf( fp, "1 JMOVE #rtchome1\n" );
+		fprintf( fp, "  GOTO 1\n" );
+		fprintf( fp, "  RTC_SW 1: OFF\n" );
+		fprintf( fp, ".END\n" );
+		fprintf( fp, ".PROGRAM rb_rtc2()\n" );
+		fprintf( fp, "  FOR .i = 1 TO 8\n" );
+		fprintf( fp, "    .acc[.i] = 1\n" );
+		fprintf( fp, "  END\n" );
+		fprintf( fp, "  L3ACCURACY .acc[1] ALWAYS\n" );
+		fprintf( fp, "  FOR .i = 1 TO 8\n" );
+		fprintf( fp, "    .acc[.i] = 0\n" );
+		fprintf( fp, "  END\n" );
+		fprintf( fp, "  RTC_SW 2: ON\n" );
+		fprintf( fp, "1 JMOVE #rtchome2\n" );
+		fprintf( fp, "  GOTO 1\n" );
+		fprintf( fp, "  RTC_SW 2: OFF\n" );
+		fprintf( fp, ".END\n" );
+	    }
+	    else
+	    {
+		fprintf( fp, ".PROGRAM rb_rtc1()\n" );
+		fprintf( fp, "  GROUP -1\n" );
+		fprintf( fp, "  ACCURACY 1 FINE\n" );
+		fprintf( fp, "  JMOVE #rtchome1\n" );
+		fprintf( fp, "  ACCURACY 0 ALWAYS\n" );
+		fprintf( fp, "  RTC_SW 1: ON\n" );
+		fprintf( fp, "1 SWAIT 388\n" );
+		fprintf( fp, "  JMOVE #rtchome1\n" );
+	      //fprintf( fp, "1 JMOVE #rtchome1\n" );
+		fprintf( fp, "  GOTO 1\n" );
+		fprintf( fp, "  RTC_SW 1: OFF\n" );
+		fprintf( fp, ".END\n" );
+	    }
+	    fclose( fp );
+	}
+	else
+	{
+	    const auto	fp_in = fopen(rtcprog.c_str(), "r");
+	    if (!fp_in)
+	    {
+		errorPrint("RTC program[%s] cannot be opened",
+			   rtcprog.c_str());
+		return false;
+	    }
+
+	    for(char buf[256]; fgets(buf, sizeof(buf), fp_in); )
+		fprintf(fp, buf);
+	}
     }
     else
     {

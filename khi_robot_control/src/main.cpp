@@ -73,6 +73,7 @@ static struct
   std::string ip_;
   bool simulation_;
   std::string robot_;
+  std::string rtcprog_;
 }
 g_options;
 
@@ -85,6 +86,7 @@ void Usage( const string &msg = "" )
     fprintf(stderr, "    -p, --period                RT loop period in msec\n");
     fprintf(stderr, "    -v, --viewer                Viewing robot through Rviz\n");
     fprintf(stderr, "    -r, --robot                 Robot name\n");
+    fprintf(stderr, "    -n, --rtcprog               RTC program name\n");
     fprintf(stderr, "    -h, --help                  Print this message and exit\n");
     if ( msg != "" )
     {
@@ -328,7 +330,7 @@ void *controlLoop( void* )
     khi_robot_control::KhiRobotHardwareInterface robot;
     controller_manager::ControllerManager cm(&robot);
     double period_diff = 0;
-    if ( !robot.open( g_options.robot_, g_options.ip_, g_options.period_, g_options.simulation_ ) )
+    if ( !robot.open( g_options.robot_, g_options.ip_, g_options.period_, g_options.rtcprog_, g_options.simulation_ ) )
     {
         ROS_ERROR( "Failed to open KHI robot" );
         publisher.stop();
@@ -499,6 +501,7 @@ int main(int argc, char *argv[])
     g_options.period_ = 4e+6;  /* 4ms */
     g_options.simulation_ = false;
     g_options.write_ = true;
+    g_options.rtcprog_ = "";
 
     while (true)
     {
@@ -510,9 +513,10 @@ int main(int argc, char *argv[])
             {"viewer", no_argument, 0, 'v'},
             {"period", required_argument, 0, 'p'},
             {"robot", required_argument, 0, 'r'},
+            {"rtcprog", required_argument, 0, 'n'},
         };
         int option_index = 0;
-        int c = getopt_long( argc, argv, "hi:lvp:r:", long_options, &option_index );
+        int c = getopt_long( argc, argv, "hi:lvp:r:n:", long_options, &option_index );
         if (c == -1)
         {
             break;
@@ -540,6 +544,9 @@ int main(int argc, char *argv[])
           case 'r':
             g_options.robot_ = std::string(optarg);
             break;
+          case 'n':
+            g_options.rtcprog_ = std::string(optarg);
+            break;
           default:
             break;
         }
@@ -564,4 +571,3 @@ int main(int argc, char *argv[])
     ros::waitForShutdown();
     return rv;
 }
-

@@ -66,7 +66,7 @@ public:
     bool setState( const int& cont_no, const int& state );
 
     bool initialize( const int& cont_no, const double& period, KhiRobotData& data, const bool in_simulation = false ) override;
-    bool open( const int& cont_no, const std::string& ip_address, KhiRobotData& data ) override;
+    bool open( const int& cont_no, const std::string& ip_address, KhiRobotData& data, const std::string& rtcprog ) override;
     bool close( const int& cont_no ) override;
     bool activate( const int& cont_no, KhiRobotData& data ) override;
     bool hold( const int& cont_no, const KhiRobotData& data ) override;
@@ -84,7 +84,7 @@ public:
     bool exec_as(const int& cont_no, const std::string& as_cmd) override;
     bool set_state_trigger(const int& cont_no,
 			   KhiRobotStateTrigger trigger) override;
-    
+
 private:
     /* general */
     char cmd_buf[KRNX_MSGSIZE];
@@ -101,8 +101,10 @@ private:
     bool conditionCheck( const int& cont_no, const KhiRobotData& data );
     bool setRobotDataHome( const int& cont_no, KhiRobotData& data );
     std::vector<std::string> splitString( const std::string& str, const char& del );
-    bool loadDriverParam( const int& cont_no, KhiRobotData& data );
-    bool loadRtcProg( const int& cont_no, const std::string& name );
+    bool loadDriverParam( const int& cont_no, KhiRobotData& data,
+			  const std::string& rtcprog );
+    bool loadRtcProg( const int& cont_no, const std::string& name,
+		      const std::string& rtcprog );
     bool syncRtcPos( const int& cont_no, KhiRobotData& data );
 };
 
