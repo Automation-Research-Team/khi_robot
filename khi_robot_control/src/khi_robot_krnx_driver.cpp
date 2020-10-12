@@ -883,14 +883,11 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
 	    else
 	    {
 		fprintf( fp, ".PROGRAM rb_rtc1()\n" );
-		fprintf( fp, "  GROUP -1\n" );
 		fprintf( fp, "  ACCURACY 1 FINE\n" );
 		fprintf( fp, "  JMOVE #rtchome1\n" );
 		fprintf( fp, "  ACCURACY 0 ALWAYS\n" );
 		fprintf( fp, "  RTC_SW 1: ON\n" );
-		fprintf( fp, "1 SWAIT 388\n" );
-		fprintf( fp, "  JMOVE #rtchome1\n" );
-	      //fprintf( fp, "1 JMOVE #rtchome1\n" );
+		fprintf( fp, "1 JMOVE #rtchome1\n" );
 		fprintf( fp, "  GOTO 1\n" );
 		fprintf( fp, "  RTC_SW 1: OFF\n" );
 		fprintf( fp, ".END\n" );
