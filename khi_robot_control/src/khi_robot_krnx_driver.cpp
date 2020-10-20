@@ -175,7 +175,7 @@ bool KhiRobotKrnxDriver::initialize( const int& cont_no, const double& period, K
     return true;
 }
 
-bool KhiRobotKrnxDriver::open( const int& cont_no, const std::string& ip_address, KhiRobotData& data, const std::string& rtcprog )
+bool KhiRobotKrnxDriver::open( const int& cont_no, const std::string& ip_address, KhiRobotData& data, const std::string& rtcprog)
 {
     char c_ip_address[64] = { 0 };
 
@@ -848,8 +848,8 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
         rsize = readlink( fd_path, file_path, sizeof(file_path) );
         if ( rsize < 0 ) { return false; }
 
-        /* RTC program */
-	if ( rtcprog == "")
+      /* RTC program */
+	if (rtcprog == "")
 	{
 	    if ( name == KHI_ROBOT_WD002N )
 	    {
@@ -879,6 +879,8 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
 		fprintf( fp, "  GOTO 1\n" );
 		fprintf( fp, "  RTC_SW 2: OFF\n" );
 		fprintf( fp, ".END\n" );
+
+		infoPrint("Loaded RTC program for WD002N");
 	    }
 	    else
 	    {
@@ -891,8 +893,9 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
 		fprintf( fp, "  GOTO 1\n" );
 		fprintf( fp, "  RTC_SW 1: OFF\n" );
 		fprintf( fp, ".END\n" );
+
+		infoPrint("Loaded RTC program for other KHI robots");
 	    }
-	    fclose( fp );
 	}
 	else
 	{
@@ -906,7 +909,13 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
 
 	    for(char buf[256]; fgets(buf, sizeof(buf), fp_in); )
 		fprintf(fp, buf);
+
+	    infoPrint("Loaded RTC program[%s]", rtcprog.c_str());
+
+	    fclose(fp_in);
 	}
+
+	fclose( fp );
     }
     else
     {
@@ -1178,7 +1187,7 @@ KhiRobotKrnxDriver::exec_as(const int& cont_no, const std::string& as_cmd)
 				     resp, sizeof(resp), &acode);
     if (dcode != KRNX_NOERROR)
     {
-	ROS_ERROR("exec_as(): %s", resp);
+	errorPrint("exec_as(): %s", resp);
 	return false;
     }
 
@@ -1196,7 +1205,7 @@ KhiRobotKrnxDriver::set_state_trigger(const int& cont_no,
       case HOLD:
 	if (state != ACTIVE)
 	{
-	    ROS_WARN("NOT ACTIVE STATE");
+	    warnPrint("NOT ACTIVE STATE");
 	    return false;
 	}
 	break;
@@ -1204,7 +1213,7 @@ KhiRobotKrnxDriver::set_state_trigger(const int& cont_no,
       case RESTART:
 	if ((state != INACTIVE) && (state != HOLDED) && (state != ERROR))
 	{
-	    ROS_WARN("NOT INACTIVE/HOLDED/ERROR STATE");
+	    warnPrint("NOT INACTIVE/HOLDED/ERROR STATE");
 	    return false;
 	}
 	break;
@@ -1213,7 +1222,7 @@ KhiRobotKrnxDriver::set_state_trigger(const int& cont_no,
 	break;
 
       default:
-	ROS_ERROR("Unknown state trigger");
+	errorPrint("Unknown state trigger");
 	return false;
     }
 
