@@ -37,7 +37,7 @@
     <xacro:property name="j3_length" value="0.0925"/>
     <xacro:property name="j4_length" value="0.3825"/>
     <xacro:property name="j5_length" value="0.078"/>
-    
+
     <!-- joint limits [rad] -->
     <xacro:property name="j1_lower_limit" value="${radians(-180)}"/>
     <xacro:property name="j1_upper_limit" value="${radians( 180)}"/>
@@ -74,14 +74,16 @@
     <link name="${prefix}base_link">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J0.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J0.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}White"/>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J0.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J0.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
@@ -102,14 +104,16 @@
     <link name="${prefix}link1">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J1.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J1.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}White"/>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J1.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J1.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
@@ -129,14 +133,16 @@
     <link name="${prefix}link2">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J2.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J2.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J2.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J2.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </collision>
@@ -156,14 +162,17 @@
     <link name="${prefix}link3">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J3.stl"/>
+          <mesh
+	      filename="package://khi_rs_description/meshes/RS007L_J3.stl"
+	      scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J3.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J3.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin xyz="0 0 0" rpy="0 ${dh_j1_j2_roty*-1} 0"/>
       </collision>
@@ -183,14 +192,16 @@
     <link name="${prefix}link4">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J4.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J4.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}White"/>
         <origin xyz="0 0 ${j4_length}" rpy="0 0 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J4.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J4.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin xyz="0 0 ${j4_length}" rpy="0 0 0"/>
       </collision>
@@ -210,14 +221,16 @@
     <link name="${prefix}link5">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J5.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J5.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}White"/>
         <origin xyz="0 0 0" rpy="0 ${dh_j4_j5_roty*-1} 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J5.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J5.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin xyz="0 0 0" rpy="0 ${dh_j4_j5_roty*-1} 0"/>
       </collision>
@@ -237,14 +250,16 @@
     <link name="${prefix}link6">
       <visual>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J6.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J6.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="${prefix}Black"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://khi_rs_description/meshes/RS007L_J6.stl"/>
+          <mesh filename="package://khi_rs_description/meshes/RS007L_J6.stl"
+		scale="0.001 0.001 0.001"/>
         </geometry>
         <origin xyz="0 0 0" rpy="0 0 0"/>
       </collision>
