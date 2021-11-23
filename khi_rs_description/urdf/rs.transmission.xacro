@@ -14,6 +14,17 @@
     </joint>
   </transmission>
 
+  <transmission name="${prefix}joint${number}_vel_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <actuator name="${prefix}joint${number}_vel_motor">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+    <joint name="${prefix}joint${number}">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+  </transmission>
+
 </xacro:macro>
 
 <xacro:macro name="add_transmissions" params="prefix">
