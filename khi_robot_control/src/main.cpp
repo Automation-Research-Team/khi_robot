@@ -36,6 +36,10 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
+#include <stdio.h>
+#include <iostream>
+#include <ctime>
+
 #include <getopt.h>
 #include <execinfo.h>
 #include <csignal>
@@ -98,7 +102,7 @@ void Usage( const string &msg = "" )
         exit(0);
     }
 }
-
+void anylog_out(char *pBuf);
 static int g_quit = 0;
 static double last_published, last_loop_start, last_rt_monitor_time;
 static const int SEC_2_NSEC = 1e+9;
@@ -327,8 +331,11 @@ void *controlLoop( void* )
     /* Initialization */
     struct timespec tick;
     ros::Duration durp( g_options.period_ / 1e+9 );
+ROS_INFO("SEARCH:durp sec= %u, nsec = %u", durp.sec, durp.nsec);//hayashi
+anylog_out("log_start"); // hayashi
     khi_robot_control::KhiRobotHardwareInterface robot;
     controller_manager::ControllerManager cm(&robot);
+    robot.velocity_flag = false; // hayashi
     double period_diff = 0;
     if ( !robot.open( g_options.robot_, g_options.ip_, g_options.period_, g_options.rtcprog_, g_options.simulation_ ) )
     {
@@ -570,4 +577,43 @@ int main(int argc, char *argv[])
     pthread_join(controlThread, reinterpret_cast<void **>(&rv));
     ros::waitForShutdown();
     return rv;
+}
+
+
+void anylog_out(char *pBuf)
+{
+    FILE *fp;
+    char buf[50];
+    //time_t t;
+    //struct tm* jstTm; //time構造体
+ 	struct timespec ts;
+	struct tm t;
+
+    int ret = clock_gettime(CLOCK_REALTIME, &ts);
+    localtime_r(&ts.tv_sec, &t);
+  
+    if( (fp = fopen("/home/artuser/logs/ros_debug.log","a")) != NULL )
+    {
+
+	//fprintf( fp, ".PROGRAM rb_rtc1()\n" );
+	
+        fprintf(fp,"[%04d/%02d/%02d %02d:%02d:%02d.%03d] ",
+            t.tm_year + 1900,
+            t.tm_mon + 1,
+            t.tm_mday,
+            t.tm_hour,
+            t.tm_min,
+            t.tm_sec,
+            (int)(ts.tv_nsec / 1000000) );
+    
+	    fprintf( fp, pBuf);
+	    fprintf( fp, "\n" );
+
+        fclose(fp);
+    }
+    else
+    {
+        printf("not file open\n");
+    }
+
 }

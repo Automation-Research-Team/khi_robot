@@ -27,7 +27,7 @@
  *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
  *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
  *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+pos_handle *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
@@ -80,11 +80,24 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
                         data.arm[ano].type[jt] = jt_ptr->type;
                         hardware_interface::JointStateHandle state_handle( data.arm[ano].name[jt], &data.arm[ano].pos[jt], &data.arm[ano].vel[jt], &data.arm[ano].eff[jt] );
                         joint_state_interface.registerHandle( state_handle );
-                        hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
-                        joint_position_interface.registerHandle( pos_handle );
+
+                        //hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
+                        //joint_position_interface.registerHandle( pos_handle );
+/****/
+                        if(velocity_flag == false)
+                        {
+                            hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
+                            joint_position_interface.registerHandle( pos_handle );
+                        }
+                        else
+                        {// hayashi
+                            hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].velocity_cmd[jt] );
+                            joint_velocity_interface.registerHandle( pos_handle );
+
+                        }
+/****/
                         ros::NodeHandle nh_limits(robot_name);
                         joint_limits_interface::JointLimits limits;
-
                         joint_limits_interface::getJointLimits( data.arm[ano].name[jt], nh_limits, limits );
                         joint_limits_interface::PositionJointSaturationHandle limits_handle( joint_position_interface.getHandle( data.arm[ano].name[jt] ), limits );
                         joint_limit_interface.registerHandle( limits_handle );
@@ -98,6 +111,8 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
                 }
             }
              data.arm[ano].jt_num = jt;
+ROS_INFO("SEARCH:hardware open ano= %d, jt_num = %d", ano, data.arm[ano].jt_num); // hayashi
+
         }
     }
 
@@ -107,8 +122,18 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
     }
 
     registerInterface( &joint_state_interface );
-    registerInterface( &joint_position_interface );
 
+    //registerInterface( &joint_position_interface );
+/***/
+    if(velocity_flag == false)
+    {
+        registerInterface( &joint_position_interface );
+    }
+    else
+    {
+        registerInterface( &joint_velocity_interface ); // hayashi
+    }
+/***/
     /* start KhiRobotClient */
     client = new KhiRobotClient();
     return client->open( ip_address, period, data, rtcprog, in_simulation );

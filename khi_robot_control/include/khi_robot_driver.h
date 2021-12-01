@@ -55,6 +55,9 @@ struct KhiRobotArmData
     double vel[KHI_MAX_JOINT];
     double eff[KHI_MAX_JOINT];
     double home[KHI_MAX_JOINT];
+    double velocity_cmd[KHI_MAX_JOINT]; // hayashi
+    double cmd_old[KHI_MAX_JOINT];
+    double pos_old[KHI_MAX_JOINT];
 };
 
 struct KhiRobotData
