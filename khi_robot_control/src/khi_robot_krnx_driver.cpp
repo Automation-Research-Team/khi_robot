@@ -559,7 +559,7 @@ ROS_INFO( "SEARCH:KhiRobotKrnxDriver::readData in_simulation" );// hayashi
 
     static std::vector<TKrnxCurMotionData> motion_data[KRNX_MAX_CONTROLLER][KRNX_MAX_ROBOT];
     TKrnxCurMotionData motion_cur[KRNX_MAX_ROBOT];
-    TKrnxCurMotionDataEx motion_cur2[KRNX_MAX_ROBOT]; // hayashi
+    //TKrnxCurMotionDataEx motion_cur2[KRNX_MAX_ROBOT]; // hayashi
     float ang[KRNX_MAX_ROBOT][KRNX_MAXAXES] = {{ 0 }};
     float vel[KRNX_MAX_ROBOT][KRNX_MAXAXES] = {{ 0 }};
 
