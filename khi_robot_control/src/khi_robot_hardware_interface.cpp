@@ -73,8 +73,10 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
             {
                 if ( nh_joints.getParam( controller_names[cno] + "/joints", joint_names ) )
                 {
+ROS_INFO("SEARCH:cno= %d, controller_names = %s", cno, controller_names[cno].c_str());//hayashi
                     for ( int n = 0; n < joint_names.size(); n++ )
                     {
+ROS_INFO("SEARCH:n= %d, joint_names = %s", n, joint_names[n].c_str());//hayashi
                         data.arm[ano].name[jt] = joint_names[n];
                         auto jt_ptr = model.getJoint( joint_names[n] );
                         data.arm[ano].type[jt] = jt_ptr->type;
@@ -84,17 +86,18 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
                         //hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
                         //joint_position_interface.registerHandle( pos_handle );
 /****/
-                        if(velocity_flag == false)
-                        {
+//                        if(velocity_flag == false)
+//                        {
                             hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
                             joint_position_interface.registerHandle( pos_handle );
-                        }
-                        else
-                        {// hayashi
-                            hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].velocity_cmd[jt] );
-                            joint_velocity_interface.registerHandle( pos_handle );
+ //                       }
+  //                      else
+   //                     {// hayashi
+                            //hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].velocity_cmd[jt] );
+                            hardware_interface::JointHandle pos_handle2( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].velocity_cmd[jt] );
+                            joint_velocity_interface.registerHandle( pos_handle2 );
 
-                        }
+    //                    }
 /****/
                         ros::NodeHandle nh_limits(robot_name);
                         joint_limits_interface::JointLimits limits;
@@ -125,17 +128,19 @@ ROS_INFO("SEARCH:hardware open ano= %d, jt_num = %d", ano, data.arm[ano].jt_num)
 
     //registerInterface( &joint_position_interface );
 /***/
-    if(velocity_flag == false)
-    {
+//    if(velocity_flag == false)
+ //   {
         registerInterface( &joint_position_interface );
-    }
-    else
-    {
+  //  }
+   // else
+    //{
         registerInterface( &joint_velocity_interface ); // hayashi
-    }
+    //}
 /***/
     /* start KhiRobotClient */
     client = new KhiRobotClient();
+//double pp, ii, dd, i_max, i_min;
+//joint_velocity_interface.getGains(pp,ii,dd,i_max,i_min);
     return client->open( ip_address, period, data, rtcprog, in_simulation );
 }
 

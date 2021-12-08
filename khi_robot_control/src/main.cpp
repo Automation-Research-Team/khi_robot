@@ -334,8 +334,13 @@ void *controlLoop( void* )
 ROS_INFO("SEARCH:durp sec= %u, nsec = %u", durp.sec, durp.nsec);//hayashi
 anylog_out("log_start"); // hayashi
     khi_robot_control::KhiRobotHardwareInterface robot;
-    controller_manager::ControllerManager cm(&robot);
     robot.velocity_flag = false; // hayashi
+    controller_manager::ControllerManager cm(&robot);
+//ROS_INFO("SEARCH: has_velocity_= %d, p_gain_= %lf, i_gain_= %lf, d_gain_= %lf", cm.command_struct_.has_velocity_,
+// 	 cm.command_struct_.p_gain_, cm.command_struct_.i_gain_, cm.command_struct_.d_gain_);//hayashi
+double pp, ii, dd, i_max, i_min;
+//cm.getGains(pp,ii,dd,i_max,i_min);
+//robot.getGains(pp,ii,dd,i_max,i_min);
     double period_diff = 0;
     if ( !robot.open( g_options.robot_, g_options.ip_, g_options.period_, g_options.rtcprog_, g_options.simulation_ ) )
     {
