@@ -21,9 +21,14 @@
   <arg name="robot" default="NONE" />
   <arg name="robot_args" value="--robot $(arg robot)" />
 
+  <arg name="velocity_control" default="false" />
+  <arg unless="$(arg velocity_control)" name="velocity_control_args" value="" />
+  <arg     if="$(arg velocity_control)" name="velocity_control_args" value="--velocity_control" />
+
+
   <!-- Load hardware interface -->
   <node name="khi_robot_control" pkg="khi_robot_control"
-        type="main" args="$(arg ip_args) $(arg viewer_args) $(arg period_args) $(arg robot_args)"
+        type="main" args="$(arg ip_args) $(arg viewer_args) $(arg period_args) $(arg robot_args) $(arg velocity_control_args)"
         respawn="false" output="screen" launch-prefix="$(arg launch_prefix)" cwd="node">
   </node>
 

@@ -131,6 +131,9 @@ static struct
 }
 g_stats;
 
+bool vel_flag = false; // hayashi
+
+
 static void publishDiagnostics(RealtimePublisher<diagnostic_msgs::DiagnosticArray>& publisher)
 {
     if ( publisher.trylock() )
@@ -334,7 +337,8 @@ void *controlLoop( void* )
 ROS_INFO("SEARCH:durp sec= %u, nsec = %u", durp.sec, durp.nsec);//hayashi
 anylog_out("log_start"); // hayashi
     khi_robot_control::KhiRobotHardwareInterface robot;
-    robot.velocity_flag = false; // hayashi
+    // robot.velocity_flag = false; // hayashi
+    robot.velocity_flag = vel_flag; // hayashi
     controller_manager::ControllerManager cm(&robot);
 //ROS_INFO("SEARCH: has_velocity_= %d, p_gain_= %lf, i_gain_= %lf, d_gain_= %lf", cm.command_struct_.has_velocity_,
 // 	 cm.command_struct_.p_gain_, cm.command_struct_.i_gain_, cm.command_struct_.d_gain_);//hayashi
@@ -505,6 +509,7 @@ static pthread_attr_t controlThreadAttr;
 
 int main(int argc, char *argv[])
 {
+    //bool vel_flag = false; // hayashi
     /* Initialize ROS and parse command-line arguments */
     ros::init( argc, argv, "KhiRobotControl" );
 
@@ -526,9 +531,10 @@ int main(int argc, char *argv[])
             {"period", required_argument, 0, 'p'},
             {"robot", required_argument, 0, 'r'},
             {"rtcprog", required_argument, 0, 'n'},
+            {"velocity_control", no_argument, 0, 'k'}, // hayashi
         };
         int option_index = 0;
-        int c = getopt_long( argc, argv, "hi:lvp:r:n:", long_options, &option_index );
+        int c = getopt_long( argc, argv, "hi:lvp:r:n:k", long_options, &option_index );
         if (c == -1)
         {
             break;
@@ -559,6 +565,10 @@ int main(int argc, char *argv[])
           case 'n':
             g_options.rtcprog_ = std::string(optarg);
             break;
+          case 'k': // hayashi
+            ROS_INFO( "velocity_control" );
+            vel_flag = true;
+            break;
           default:
             break;
         }
@@ -568,6 +578,7 @@ int main(int argc, char *argv[])
     {
         Usage( "Extra arguments" );
     }
+    ROS_INFO( "SEARCH: vel_flag = %d", vel_flag );
 
     /* Start controlLoop thread */
     int rv = pthread_create( &controlThread, &controlThreadAttr, controlLoop, 0 );
