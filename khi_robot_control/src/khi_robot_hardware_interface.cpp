@@ -35,6 +35,7 @@ pos_handle *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 #include <khi_robot_hardware_interface.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <urdf/model.h>
+#include <velocity_controllers/joint_position_controller.h>// add hayashi
 
 namespace khi_robot_control
 {
@@ -126,21 +127,15 @@ ROS_INFO("SEARCH:n= %d, joint_names = %s", n, joint_names[n].c_str());//hayashi
 	                    	
 	                        data.arm[ano].name[jt] = joint_names[n];
 	                        auto jt_ptr = model.getJoint( joint_names[n] );
-ROS_INFO("path1");// hayashi 確認
 	                        data.arm[ano].type[jt] = jt_ptr->type;
-ROS_INFO("path2");// hayashi 確認
 	                        hardware_interface::JointStateHandle state_handle( data.arm[ano].name[jt], &data.arm[ano].pos[jt], &data.arm[ano].vel[jt], &data.arm[ano].eff[jt] );
-ROS_INFO("path3");// hayashi 確認
 	                    	joint_state_interface.registerHandle( state_handle );// ここで位置、速度、エフォートのアドレスを登録
 
-ROS_INFO("path4");// hayashi 確認
 	                        hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].velocity_cmd[jt] );
 		                    joint_velocity_interface.registerHandle(pos_handle);// hayashi
 	                    	
-ROS_INFO("path5");// hayashi 確認
 
 	                        //ros::NodeHandle nh_limits(robot_name);
-ROS_INFO("path6");// hayashi 確認
 	                        //joint_limits_interface::JointLimits limits;
 
 	                        //joint_limits_interface::getJointLimits( data.arm[ano].name[jt], nh_limits, limits );
@@ -177,12 +172,24 @@ ROS_INFO("path6");// hayashi 確認
     else
     {
         registerInterface( &joint_velocity_interface ); // hayashi
+std::vector<std::string> join_names = joint_velocity_interface.getNames();
+ROS_INFO("SEARCH:joint_velocity_interface join_names.size = %d", join_names.size());
+double pp, ii, dd, i_max, i_min;
+
+for(int i = 0; i < join_names.size(); i++)
+{
+    ROS_INFO("SEARCH:joint_velocity_interface join_names = %s", join_names[i].c_str());
+hardware_interface::JointHandle jointda = joint_velocity_interface.getHandle(join_names[i]);
+//velocity_controllers::JointPositionController jointda2 = (velocity_controllers::JointPositionController)jointda;
+//velocity_controllers::JointPositionController::hardware_interface::JointHandle jointda = joint_velocity_interface.getHandle(join_names[i]);
+//jointda.getGains(pp,ii,dd,i_max,i_min);
+//double aaa = jointda.command_struct_.position_;
+double bbb = jointda.getPosition();
+}
     }
 /***/
     /* start KhiRobotClient */
     client = new KhiRobotClient();
-//double pp, ii, dd, i_max, i_min;
-//joint_velocity_interface.getGains(pp,ii,dd,i_max,i_min);
     return client->open( ip_address, period, data, rtcprog, in_simulation );
 }
 

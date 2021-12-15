@@ -342,7 +342,7 @@ anylog_out("log_start"); // hayashi
     controller_manager::ControllerManager cm(&robot);
 //ROS_INFO("SEARCH: has_velocity_= %d, p_gain_= %lf, i_gain_= %lf, d_gain_= %lf", cm.command_struct_.has_velocity_,
 // 	 cm.command_struct_.p_gain_, cm.command_struct_.i_gain_, cm.command_struct_.d_gain_);//hayashi
-double pp, ii, dd, i_max, i_min;
+//double pp, ii, dd, i_max, i_min;
 //cm.getGains(pp,ii,dd,i_max,i_min);
 //robot.getGains(pp,ii,dd,i_max,i_min);
     double period_diff = 0;
@@ -364,7 +364,41 @@ double pp, ii, dd, i_max, i_min;
         ros::shutdown();
         return NULL;
     }
+/***
+std::vector<std::string> join_names = robot.getNames();
+    ROS_INFO("SEARCH: join_names.size = %d", join_names.size());
+for(int i = 0; i < join_names.size(); i++)
+{
+    ROS_INFO("SEARCH: join_names = %s", join_names[i].c_str());
+}
+*****/
 
+    ROS_INFO("SEARCH: path1");
+/**
+controller_interface::ControllerBase *controller_base;
+//std::string name = "arm_joint1";
+std::string name = "arm_velocity_controller";
+controller_base = cm.getControllerByName(name);
+    ROS_INFO("SEARCH: path2");
+if(controller_base == NULL)
+{
+    ROS_INFO("SEARCH: cm.getControllerByName NG");
+}
+else
+{
+    ROS_INFO("SEARCH: cm.getControllerByName OK");
+}
+**/
+ROS_INFO("SEARCH: path3");
+/**
+std::vector<std::string> controler_names;
+cm.getControllerNames(controler_names);
+	
+for(int i = 0; i < controler_names.size(); i++)
+{
+    ROS_INFO("SEARCH: i = %d, controler_names = %s", i, controler_name[i].c_str());
+}	
+**/
     while ( !g_quit )
     {
         double this_loop_start = now();
@@ -519,6 +553,10 @@ int main(int argc, char *argv[])
     g_options.simulation_ = false;
     g_options.write_ = true;
     g_options.rtcprog_ = "";
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+    {
+        ros::console::notifyLoggerLevelsChanged();
+    }
 
     while (true)
     {
