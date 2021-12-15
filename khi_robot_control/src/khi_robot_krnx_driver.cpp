@@ -782,8 +782,8 @@ anylog_out(tmp_buf);// hayashi
 
     for ( int ano = 0; ano < arm_num; ano++ )
     {
-        /////return_code = krnx_PrimeRtcCompData( cont_no, ano, &p_rtc_data->comp[ano][0], &p_rtc_data->status[ano][0] );
-        /////if ( !retKrnxRes( cont_no, "krnx_PrimeRtcCompData", return_code ) ) { is_primed = false; }
+     ////   return_code = krnx_PrimeRtcCompData( cont_no, ano, &p_rtc_data->comp[ano][0], &p_rtc_data->status[ano][0] );
+     ////   if ( !retKrnxRes( cont_no, "krnx_PrimeRtcCompData", return_code ) ) { is_primed = false; }
     }
     if ( !is_primed )
     {
@@ -812,7 +812,7 @@ anylog_out(tmp_buf);// hayashi
         return false;
     }
 
-    /////return_code = krnx_SendRtcCompData( cont_no, p_rtc_data->seq_no );
+    //return_code = krnx_SendRtcCompData( cont_no, p_rtc_data->seq_no );
     p_rtc_data->seq_no++;
 
     return retKrnxRes( cont_no, "krnx_SendRtcCompData", return_code );
