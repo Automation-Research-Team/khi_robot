@@ -62,8 +62,6 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
     data.robot_name = robot_name;
 
     data.arm_num = 0;
-	if(velocity_flag == false)
-	{
     for ( int ano = 0; ano < KHI_MAX_ARM; ano++ )
     {
         jt = 0;
@@ -105,56 +103,6 @@ ROS_INFO("SEARCH:n= %d, joint_names = %s", n, joint_names[n].c_str());//hayashi
              data.arm[ano].jt_num = jt;
         }
     }
-    }
-	else
-	{// hayashi追加
-	    for ( int ano = 0; ano < KHI_MAX_ARM; ano++ )
-	    {
-	        jt = 0;
-	        data.arm[ano].jt_num = 0;
-	        param[ano] << "khi_robot_param/arm/velarm" << ano + 1;
-	        if ( nh_joints.getParam( param[ano].str(), controller_names ) )
-	        {
-	            data.arm_num++;
-	            for ( int cno = 0; cno < controller_names.size(); cno++ )
-	            {
-        			ROS_INFO("cno = %d, controller_names = %s", cno, controller_names[cno].c_str());// hayashi 確認
-	                if ( nh_joints.getParam( controller_names[cno] + "/joints", joint_names ) )
-	                {
-	                    for ( int n = 0; n < joint_names.size(); n++ )
-	                    {
-        			        ROS_INFO("n = %d, joint_names = %s", cno, joint_names[n].c_str());// hayashi 確認
-	                    	
-	                        data.arm[ano].name[jt] = joint_names[n];
-	                        auto jt_ptr = model.getJoint( joint_names[n] );
-	                        data.arm[ano].type[jt] = jt_ptr->type;
-	                        hardware_interface::JointStateHandle state_handle( data.arm[ano].name[jt], &data.arm[ano].pos[jt], &data.arm[ano].vel[jt], &data.arm[ano].eff[jt] );
-	                    	joint_state_interface.registerHandle( state_handle );// ここで位置、速度、エフォートのアドレスを登録
-
-	                        hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].velocity_cmd[jt] );
-		                    joint_velocity_interface.registerHandle(pos_handle);// hayashi
-	                    	
-
-	                        //ros::NodeHandle nh_limits(robot_name);
-	                        //joint_limits_interface::JointLimits limits;
-
-	                        //joint_limits_interface::getJointLimits( data.arm[ano].name[jt], nh_limits, limits );
-	                        // koko
-	                        //joint_limits_interface::PositionJointSaturationHandle limits_handle( joint_position_interface.getHandle( data.arm[ano].name[jt] ), limits );
-	                        //joint_limit_interface.registerHandle( limits_handle );
-	                        jt++;
-	                    }
-	                }
-	                else
-	                {
-	                    ROS_ERROR( "Failed to get param '/joints'" );
-	                    return false;
-	                }
-	            }
-	             data.arm[ano].jt_num = jt;
-	        }
-	    }
-	}
 
     if ( in_simulation )
     {
@@ -163,31 +111,7 @@ ROS_INFO("SEARCH:n= %d, joint_names = %s", n, joint_names[n].c_str());//hayashi
 
     registerInterface( &joint_state_interface );
 
-    //registerInterface( &joint_position_interface );
-/***/
-    if(velocity_flag == false)
-    {
-        registerInterface( &joint_position_interface );
-    }
-    else
-    {
-        registerInterface( &joint_velocity_interface ); // hayashi
-std::vector<std::string> join_names = joint_velocity_interface.getNames();
-ROS_INFO("SEARCH:joint_velocity_interface join_names.size = %d", join_names.size());
-double pp, ii, dd, i_max, i_min;
-
-for(int i = 0; i < join_names.size(); i++)
-{
-    ROS_INFO("SEARCH:joint_velocity_interface join_names = %s", join_names[i].c_str());
-hardware_interface::JointHandle jointda = joint_velocity_interface.getHandle(join_names[i]);
-//velocity_controllers::JointPositionController jointda2 = (velocity_controllers::JointPositionController)jointda;
-//velocity_controllers::JointPositionController::hardware_interface::JointHandle jointda = joint_velocity_interface.getHandle(join_names[i]);
-//jointda.getGains(pp,ii,dd,i_max,i_min);
-//double aaa = jointda.command_struct_.position_;
-double bbb = jointda.getPosition();
-}
-    }
-/***/
+    registerInterface( &joint_position_interface );
     /* start KhiRobotClient */
     client = new KhiRobotClient();
     return client->open( ip_address, period, data, rtcprog, in_simulation );

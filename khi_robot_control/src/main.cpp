@@ -375,157 +375,6 @@ for(int i = 0; i < join_names.size(); i++)
 *****/
 
     ROS_INFO("SEARCH: path1");
-    //ros::Time this_moment_( tick.tv_sec, tick.tv_nsec );
-    //cm.update( this_moment_, durp ); // added by hayashi
-//sleep(1);
-/**
-controller_interface::ControllerBase *controller_base;
-//std::string name = "arm_joint1";
-std::string name = "arm_velocity_controller";
-controller_base = cm.getControllerByName(name);
-    ROS_INFO("SEARCH: path2");
-if(controller_base == NULL)
-{
-    ROS_INFO("SEARCH: cm.getControllerByName NG");
-}
-else
-{
-    ROS_INFO("SEARCH: cm.getControllerByName OK");
-}
-**/
-////////////////////
-    while ( 1 )
-    {
-        double this_loop_start = now();
-        g_stats.loop_acc( this_loop_start - last_loop_start );
-        last_loop_start = this_loop_start;
-
-        double start = now();
-
-        ros::Time this_moment( tick.tv_sec, tick.tv_nsec );
-        robot.read( this_moment, durp );
-
-        double after_read = now();
-
-        cm.update( this_moment, durp );
-        if ( g_options.write_ )
-        {
-            /* Robot State */
-            robot.updateState();
-            state_trigger = robot.getStateTrigger();
-            if ( state_trigger == khi_robot_control::HOLD )
-            {
-                robot.hold();
-                continue;
-            }
-            else if ( state_trigger == khi_robot_control::RESTART )
-            {
-                if ( activate( robot, &tick ) )
-                {
-                    ros::Time activate_moment( tick.tv_sec, tick.tv_nsec );
-                    robot.read( activate_moment, durp );
-                    cm.update( activate_moment, durp, true );
-                }
-                continue;
-            }
-            else if ( state_trigger == khi_robot_control::QUIT )
-            {
-                g_quit = true;
-                continue;
-            }
-
-            robot.write( this_moment, durp );
-        }
-       /* Cycle Adjustment */
-        if ( robot.getPeriodDiff( period_diff ) )
-        {
-            timespecInc( tick, PERIOD_DIFF_WEIGHT * period_diff );
-        }
-
-        double end = now();
-
-        g_stats.read_acc( after_read - start );
-        g_stats.write_acc( end - after_read );
-
-        if ( ( end - last_published ) > 1.0 )
-        {
-            publishDiagnostics( publisher );
-            last_published = end;
-         }
-       /* Check Realtime Loop Frequency */
-        ++rt_cycle_count;
-        if ( ( start - last_rt_monitor_time ) > rt_loop_monitor_period )
-        {
-            /* Calculate new average rt loop frequency */
-            double rt_loop_frequency = static_cast<double>(rt_cycle_count) / rt_loop_monitor_period;
-
-            /* Use last X samples of frequency when deciding whether or not to halt */
-            rt_loop_history.sample(rt_loop_frequency);
-            double avg_rt_loop_frequency = rt_loop_history.average();
-            if ( avg_rt_loop_frequency < min_acceptable_rt_loop_frequency )
-            {
-                if ( !g_stats.rt_loop_not_making_timing )
-                {
-                    /* Only update this value if motors when this first occurs (used for diagnostics error message) */
-                    g_stats.halt_rt_loop_frequency = avg_rt_loop_frequency;
-                }
-                g_stats.rt_loop_not_making_timing = true;
-            }
-            g_stats.rt_loop_frequency = avg_rt_loop_frequency;
-            rt_cycle_count = 0;
-            last_rt_monitor_time = start;
-        }
-
-        /* Compute end of next g_options.period_ */
-        timespecInc( tick, g_options.period_ );
-       /* Check Overrun */
-        struct timespec before;
-        clock_gettime( CLOCK_REALTIME, &before );
-        if ( ( before.tv_sec + static_cast<double>(before.tv_nsec) / SEC_2_NSEC) >
-             ( tick.tv_sec + static_cast<double>(tick.tv_nsec) / SEC_2_NSEC ) )
-        {
-            /* Total amount of time the loop took to run */
-            g_stats.overrun_loop_sec = ( before.tv_sec + static_cast<double>(before.tv_nsec) / SEC_2_NSEC ) -
-                                       ( tick.tv_sec + static_cast<double>(tick.tv_nsec) / SEC_2_NSEC );
-
-            /* We overran, snap to next "g_options.period_" */
-            tick.tv_sec = before.tv_sec;
-            tick.tv_nsec = ( before.tv_nsec / g_options.period_ ) * g_options.period_;
-            timespecInc( tick, g_options.period_ );
-
-            /* Initialize overruns */
-            if ( g_stats.overruns == 0 )
-            {
-                g_stats.last_overrun = 1000;
-                g_stats.last_severe_overrun = 1000;
-            }
-            /* Check for overruns */
-            if ( g_stats.recent_overruns > 10 )
-            {
-                g_stats.last_severe_overrun = 0;
-            }
-            g_stats.last_overrun = 0;
-
-            ++g_stats.overruns;
-            ++g_stats.recent_overruns;
-            g_stats.overrun_read = after_read - start;
-            g_stats.overrun_write = end - after_read;
-        }
-
-        /* Sleep until end of g_options.period_ */
-        clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &tick, NULL );
-        /* Check Jitter */
-        struct timespec after;
-        clock_gettime( CLOCK_REALTIME, &after );
-        double jitter = ( after.tv_sec - tick.tv_sec + static_cast<double>(after.tv_nsec - tick.tv_nsec) / SEC_2_NSEC );
-        g_stats.jitter_acc( jitter );
-break;
-    }
-
-
-
-/////////////////////
-ROS_INFO("SEARCH: path3");
 /**
 std::vector<std::string> controler_names;
 cm.getControllerNames(controler_names);
@@ -704,7 +553,7 @@ int main(int argc, char *argv[])
             {"period", required_argument, 0, 'p'},
             {"robot", required_argument, 0, 'r'},
             {"rtcprog", required_argument, 0, 'n'},
-            {"velocity_control", no_argument, 0, 'k'}, // hayashi
+           // {"velocity_control", no_argument, 0, 'k'}, // hayashi
         };
         int option_index = 0;
         int c = getopt_long( argc, argv, "hi:lvp:r:n:k", long_options, &option_index );
@@ -738,10 +587,10 @@ int main(int argc, char *argv[])
           case 'n':
             g_options.rtcprog_ = std::string(optarg);
             break;
-          case 'k': // hayashi
-            ROS_INFO( "velocity_control" );
-            vel_flag = true;
-            break;
+          //case 'k': // hayashi
+           // ROS_INFO( "velocity_control" );
+            //vel_flag = true;
+           // break;
           default:
             break;
         }
