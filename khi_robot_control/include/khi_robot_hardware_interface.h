@@ -61,12 +61,10 @@ public:
     int updateState();
     int getStateTrigger();
     bool getPeriodDiff( double& diff );
-    bool velocity_flag; // hayashi
 
 private:
     hardware_interface::JointStateInterface joint_state_interface;
     hardware_interface::PositionJointInterface joint_position_interface;
-    hardware_interface::VelocityJointInterface joint_velocity_interface;//hayashi
     joint_limits_interface::PositionJointSaturationInterface joint_limit_interface;
 
     khi_robot_control::KhiRobotData data;

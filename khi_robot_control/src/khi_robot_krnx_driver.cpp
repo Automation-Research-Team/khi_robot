@@ -34,7 +34,6 @@
 
 #include <urdf/model.h>
 #include <khi_robot_krnx_driver.h>
-extern void anylog_out(char *pBuf);
 
 namespace khi_robot_control
 {
@@ -538,8 +537,6 @@ bool KhiRobotKrnxDriver::readData( const int& cont_no, KhiRobotData& data )
 
     if ( in_simulation )
     {
-ROS_INFO( "SEARCH:KhiRobotKrnxDriver::readData in_simulation" );// hayashi
-
         for ( int ano = 0; ano < arm_num; ano++ )
         {
             memcpy( data.arm[ano].pos, data.arm[ano].cmd, sizeof(data.arm[ano].pos) );
@@ -559,11 +556,8 @@ ROS_INFO( "SEARCH:KhiRobotKrnxDriver::readData in_simulation" );// hayashi
 
     static std::vector<TKrnxCurMotionData> motion_data[KRNX_MAX_CONTROLLER][KRNX_MAX_ROBOT];
     TKrnxCurMotionData motion_cur[KRNX_MAX_ROBOT];
-    //TKrnxCurMotionDataEx motion_cur2[KRNX_MAX_ROBOT]; // hayashi
     float ang[KRNX_MAX_ROBOT][KRNX_MAXAXES] = {{ 0 }};
     float vel[KRNX_MAX_ROBOT][KRNX_MAXAXES] = {{ 0 }};
-
-    char tmp_buf[256];// hayashi
 
     for ( int ano = 0; ano < arm_num; ano++ )
     {
@@ -573,21 +567,11 @@ ROS_INFO( "SEARCH:KhiRobotKrnxDriver::readData in_simulation" );// hayashi
         {
             motion_data[cont_no][ano].erase( motion_data[cont_no][ano].begin() );
         }
-/**
-        if ( !krnx_GetCurMotionDataEx( cont_no, ano, &motion_cur2[ano] ) ) 
-        {
-anylog_out("krnx_GetCurMotionDataEx ERROR");// hayashi
-            return false; 
-        }// hayashi
-**/
-
-
         motion_data[cont_no][ano].push_back( motion_cur[ano] );
 
         // ang
         memcpy( ang[ano], &motion_cur[ano].ang, sizeof(motion_cur[ano].ang) );
         // vel
-/***
         if ( motion_data[cont_no][ano].size() > 1 )
         {
             std::vector<TKrnxCurMotionData>::iterator it = motion_data[cont_no][ano].end();
@@ -597,29 +581,6 @@ anylog_out("krnx_GetCurMotionDataEx ERROR");// hayashi
                 vel[ano][jt] = motion_data[cont_no][ano].back().ang[jt] - it->ang[jt];
             }
         }
-***/
-    	// vel logic chaneg by hayashi
-        if ( motion_data[cont_no][ano].size() > 1 )
-        {
-            std::vector<TKrnxCurMotionData>::iterator it = motion_data[cont_no][ano].end();
-            it--;
-        	std::vector<TKrnxCurMotionData>::iterator it_back;
-        	it_back = it;
-        	it_back--;
-            for ( int jt=0; jt < KHI_MAX_JOINT; jt++ )
-            {
-                //vel[ano][jt] = motion_data[cont_no][ano].back().ang[jt] - it->ang[jt];
-            	vel[ano][jt] = it_back->ang[jt]  - it->ang[jt];
-            }
-        }
-    	else
-    	{
-            for ( int jt=0; jt < KHI_MAX_JOINT; jt++ )
-            {
-            	vel[ano][jt] = 0;
-            }
-    	}
-    	//////////////////////////////
 
         for ( int jt = 0; jt < data.arm[ano].jt_num; jt++ )
         {
@@ -627,43 +588,14 @@ anylog_out("krnx_GetCurMotionDataEx ERROR");// hayashi
             data.arm[ano].vel[jt] = (double)vel[ano][jt];
             data.arm[ano].eff[jt] = (double)0; // tmp
 
-//ROS_INFO("SEARCH:readData jt= %d, pos = %lf, vel = %lf", jt,data.arm[ano].pos[jt], data.arm[ano].vel[jt]);//hayashi
-//sprintf(tmp_buf,"readData jt= %d, pos = %lf, vel = %lf", jt,data.arm[ano].pos[jt], data.arm[ano].vel[jt]);//hayashi
-//anylog_out(tmp_buf);// hayashi
             /* [ mm ] to [ m ] */
             if ( data.arm[ano].type[jt] == urdf::Joint::PRISMATIC )
             {
-ROS_INFO( "SEARCH:KhiRobotKrnxDriver::readData PRISMATIC" );// hayashi
                 data.arm[ano].pos[jt] /= KHI_KRNX_M2MM;
                 data.arm[ano].vel[jt] /= KHI_KRNX_M2MM;
             }
         }
     }
-///////////////////////debug hayashi ///////////
-/****
-if(data.arm[0].pos[0] != data.arm[0].pos_old[0]
-  || data.arm[0].pos[1] != data.arm[0].pos_old[1]
-  || data.arm[0].pos[2] != data.arm[0].pos_old[2]
-  || data.arm[0].pos[3] != data.arm[0].pos_old[3]
-  || data.arm[0].pos[4] != data.arm[0].pos_old[4]
-  || data.arm[0].pos[5] != data.arm[0].pos_old[5])
-{
-    for ( int jt = 0; jt < data.arm[0].jt_num; jt++ )
-    {
-sprintf(tmp_buf,"readData jt= %d, pos = %lf, vel = %lf, pos_old = %lf", jt,data.arm[0].pos[jt], data.arm[0].vel[jt], data.arm[0].pos_old[jt]);//hayashi
-anylog_out(tmp_buf);// hayashi
-data.arm[0].pos_old[jt] = data.arm[0].pos[jt];
-    }
-}
-******/
-/**
-    for ( int jt = 0; jt < data.arm[0].jt_num; jt++ )
-    {
-sprintf(tmp_buf,"readEx jt= %d, .ang_vel = %lf,.ang_vel_ref = %lf", jt,motion_cur2[0].ang_vel[jt], motion_cur2[0].ang_vel_ref[jt] );//hayashi
-anylog_out(tmp_buf);// hayashi
-    }
-**/
-/////////////////////////////////////////////////////////////////////////////
 
     return true;
 }
@@ -743,46 +675,18 @@ bool KhiRobotKrnxDriver::writeData( const int& cont_no, const KhiRobotData& data
         return true;
     }
 
-char tmp_buf[256];// hayashi
     /* convert */
     for ( int ano = 0; ano < arm_num; ano++ )
     {
         for ( int jt = 0; jt < data.arm[ano].jt_num; jt++ )
         {
             p_rtc_data->comp[ano][jt] = (float)(data.arm[ano].cmd[jt] - data.arm[ano].home[jt]);
-//ROS_INFO("SEARCH:WriteData jt= %d, cmd = %lf, home = %lf", jt,data.arm[ano].cmd[jt], data.arm[ano].home[jt]);//hayashi
-//sprintf(tmp_buf,"WriteData jt= %d, cmd = %lf, home = %lf", jt,data.arm[ano].cmd[jt], data.arm[ano].home[jt]);//hayashi
-//anylog_out(tmp_buf);// hayashi
-
-
             if ( data.arm[ano].type[jt] == urdf::Joint::PRISMATIC )
             {
                 p_rtc_data->comp[ano][jt] *= KHI_KRNX_M2MM;
             }
         }
     }
-///////////////////////debug hayashi ///////////
-/***
-if(data.arm[0].cmd[0] != data.arm[0].cmd_old[0]
-  || data.arm[0].cmd[1] != data.arm[0].cmd_old[1]
-  || data.arm[0].cmd[2] != data.arm[0].cmd_old[2]
-  || data.arm[0].cmd[3] != data.arm[0].cmd_old[3]
-  || data.arm[0].cmd[4] != data.arm[0].cmd_old[4]
-  || data.arm[0].cmd[5] != data.arm[0].cmd_old[5])
-{
-***/
-/****
-    for ( int jt = 0; jt < data.arm[0].jt_num; jt++ )
-    {
-
-sprintf(tmp_buf,"WriteData jt= %d, cmd = %lf, home = %lf, comp = %lf", 
-                           jt,data.arm[0].cmd[jt], data.arm[0].home[jt], (data.arm[0].cmd[jt] - data.arm[0].home[jt]));//hayashi
-anylog_out(tmp_buf);// hayashi
-//data.arm[0].cmd_old[jt] = data.arm[0].cmd[jt];
-//    }
-}
-***/
-/////////////////////////////////////////////////////////////////////////////
 
     for ( int ano = 0; ano < arm_num; ano++ )
     {

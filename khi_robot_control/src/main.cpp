@@ -36,10 +36,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <stdio.h>
-#include <iostream>
-#include <ctime>
-
 #include <getopt.h>
 #include <execinfo.h>
 #include <csignal>
@@ -102,7 +98,7 @@ void Usage( const string &msg = "" )
         exit(0);
     }
 }
-void anylog_out(char *pBuf);
+
 static int g_quit = 0;
 static double last_published, last_loop_start, last_rt_monitor_time;
 static const int SEC_2_NSEC = 1e+9;
@@ -130,9 +126,6 @@ static struct
     double rt_loop_frequency;
 }
 g_stats;
-
-bool vel_flag = false; // hayashi
-
 
 static void publishDiagnostics(RealtimePublisher<diagnostic_msgs::DiagnosticArray>& publisher)
 {
@@ -334,17 +327,8 @@ void *controlLoop( void* )
     /* Initialization */
     struct timespec tick;
     ros::Duration durp( g_options.period_ / 1e+9 );
-ROS_INFO("SEARCH:durp sec= %u, nsec = %u", durp.sec, durp.nsec);//hayashi
-anylog_out("log_start"); // hayashi
     khi_robot_control::KhiRobotHardwareInterface robot;
-    // robot.velocity_flag = false; // hayashi
-    robot.velocity_flag = vel_flag; // hayashi
     controller_manager::ControllerManager cm(&robot);
-//ROS_INFO("SEARCH: has_velocity_= %d, p_gain_= %lf, i_gain_= %lf, d_gain_= %lf", cm.command_struct_.has_velocity_,
-// 	 cm.command_struct_.p_gain_, cm.command_struct_.i_gain_, cm.command_struct_.d_gain_);//hayashi
-//double pp, ii, dd, i_max, i_min;
-//cm.getGains(pp,ii,dd,i_max,i_min);
-//robot.getGains(pp,ii,dd,i_max,i_min);
     double period_diff = 0;
     if ( !robot.open( g_options.robot_, g_options.ip_, g_options.period_, g_options.rtcprog_, g_options.simulation_ ) )
     {
@@ -355,7 +339,6 @@ anylog_out("log_start"); // hayashi
         ros::shutdown();
         return NULL;
     }
-    /////controller_manager::ControllerManager cm(&robot);
     if ( !activate( robot, &tick ) )
     {
         publisher.stop();
@@ -365,25 +348,7 @@ anylog_out("log_start"); // hayashi
         ros::shutdown();
         return NULL;
     }
-/***
-std::vector<std::string> join_names = robot.getNames();
-    ROS_INFO("SEARCH: join_names.size = %d", join_names.size());
-for(int i = 0; i < join_names.size(); i++)
-{
-    ROS_INFO("SEARCH: join_names = %s", join_names[i].c_str());
-}
-*****/
 
-    ROS_INFO("SEARCH: path1");
-/**
-std::vector<std::string> controler_names;
-cm.getControllerNames(controler_names);
-	
-for(int i = 0; i < controler_names.size(); i++)
-{
-    ROS_INFO("SEARCH: i = %d, controler_names = %s", i, controler_name[i].c_str());
-}	
-**/
     while ( !g_quit )
     {
         double this_loop_start = now();
@@ -426,6 +391,7 @@ for(int i = 0; i < controler_names.size(); i++)
 
             robot.write( this_moment, durp );
         }
+
         /* Cycle Adjustment */
         if ( robot.getPeriodDiff( period_diff ) )
         {
@@ -527,7 +493,6 @@ static pthread_attr_t controlThreadAttr;
 
 int main(int argc, char *argv[])
 {
-    //bool vel_flag = false; // hayashi
     /* Initialize ROS and parse command-line arguments */
     ros::init( argc, argv, "KhiRobotControl" );
 
@@ -537,10 +502,6 @@ int main(int argc, char *argv[])
     g_options.simulation_ = false;
     g_options.write_ = true;
     g_options.rtcprog_ = "";
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
-    {
-        ros::console::notifyLoggerLevelsChanged();
-    }
 
     while (true)
     {
@@ -553,10 +514,9 @@ int main(int argc, char *argv[])
             {"period", required_argument, 0, 'p'},
             {"robot", required_argument, 0, 'r'},
             {"rtcprog", required_argument, 0, 'n'},
-           // {"velocity_control", no_argument, 0, 'k'}, // hayashi
         };
         int option_index = 0;
-        int c = getopt_long( argc, argv, "hi:lvp:r:n:k", long_options, &option_index );
+        int c = getopt_long( argc, argv, "hi:lvp:r:n:", long_options, &option_index );
         if (c == -1)
         {
             break;
@@ -587,10 +547,6 @@ int main(int argc, char *argv[])
           case 'n':
             g_options.rtcprog_ = std::string(optarg);
             break;
-          //case 'k': // hayashi
-           // ROS_INFO( "velocity_control" );
-            //vel_flag = true;
-           // break;
           default:
             break;
         }
@@ -600,7 +556,6 @@ int main(int argc, char *argv[])
     {
         Usage( "Extra arguments" );
     }
-    ROS_INFO( "SEARCH: vel_flag = %d", vel_flag );
 
     /* Start controlLoop thread */
     int rv = pthread_create( &controlThread, &controlThreadAttr, controlLoop, 0 );
@@ -615,43 +570,4 @@ int main(int argc, char *argv[])
     pthread_join(controlThread, reinterpret_cast<void **>(&rv));
     ros::waitForShutdown();
     return rv;
-}
-
-
-void anylog_out(char *pBuf)
-{
-    FILE *fp;
-    char buf[50];
-    //time_t t;
-    //struct tm* jstTm; //time構造体
- 	struct timespec ts;
-	struct tm t;
-
-    int ret = clock_gettime(CLOCK_REALTIME, &ts);
-    localtime_r(&ts.tv_sec, &t);
-  
-    if( (fp = fopen("/home/artuser/logs/ros_debug.log","a")) != NULL )
-    {
-
-	//fprintf( fp, ".PROGRAM rb_rtc1()\n" );
-	
-        fprintf(fp,"[%04d/%02d/%02d %02d:%02d:%02d.%03d] ",
-            t.tm_year + 1900,
-            t.tm_mon + 1,
-            t.tm_mday,
-            t.tm_hour,
-            t.tm_min,
-            t.tm_sec,
-            (int)(ts.tv_nsec / 1000000) );
-    
-	    fprintf( fp, pBuf);
-	    fprintf( fp, "\n" );
-
-        fclose(fp);
-    }
-    else
-    {
-        printf("not file open\n");
-    }
-
 }
