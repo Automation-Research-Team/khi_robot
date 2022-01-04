@@ -640,6 +640,7 @@ ROS_INFO( "SEARCH:KhiRobotKrnxDriver::readData PRISMATIC" );// hayashi
         }
     }
 ///////////////////////debug hayashi ///////////
+/****
 if(data.arm[0].pos[0] != data.arm[0].pos_old[0]
   || data.arm[0].pos[1] != data.arm[0].pos_old[1]
   || data.arm[0].pos[2] != data.arm[0].pos_old[2]
@@ -654,6 +655,7 @@ anylog_out(tmp_buf);// hayashi
 data.arm[0].pos_old[jt] = data.arm[0].pos[jt];
     }
 }
+******/
 /**
     for ( int jt = 0; jt < data.arm[0].jt_num; jt++ )
     {
@@ -769,6 +771,7 @@ if(data.arm[0].cmd[0] != data.arm[0].cmd_old[0]
   || data.arm[0].cmd[5] != data.arm[0].cmd_old[5])
 {
 ***/
+/****
     for ( int jt = 0; jt < data.arm[0].jt_num; jt++ )
     {
 
@@ -778,12 +781,13 @@ anylog_out(tmp_buf);// hayashi
 //data.arm[0].cmd_old[jt] = data.arm[0].cmd[jt];
 //    }
 }
+***/
 /////////////////////////////////////////////////////////////////////////////
 
     for ( int ano = 0; ano < arm_num; ano++ )
     {
-     ////   return_code = krnx_PrimeRtcCompData( cont_no, ano, &p_rtc_data->comp[ano][0], &p_rtc_data->status[ano][0] );
-     ////   if ( !retKrnxRes( cont_no, "krnx_PrimeRtcCompData", return_code ) ) { is_primed = false; }
+        return_code = krnx_PrimeRtcCompData( cont_no, ano, &p_rtc_data->comp[ano][0], &p_rtc_data->status[ano][0] );
+        if ( !retKrnxRes( cont_no, "krnx_PrimeRtcCompData", return_code ) ) { is_primed = false; }
     }
     if ( !is_primed )
     {
@@ -812,7 +816,7 @@ anylog_out(tmp_buf);// hayashi
         return false;
     }
 
-    //return_code = krnx_SendRtcCompData( cont_no, p_rtc_data->seq_no );
+    return_code = krnx_SendRtcCompData( cont_no, p_rtc_data->seq_no );
     p_rtc_data->seq_no++;
 
     return retKrnxRes( cont_no, "krnx_SendRtcCompData", return_code );
