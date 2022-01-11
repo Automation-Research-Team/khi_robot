@@ -80,6 +80,7 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
                         data.arm[ano].type[jt] = jt_ptr->type;
                         hardware_interface::JointStateHandle state_handle( data.arm[ano].name[jt], &data.arm[ano].pos[jt], &data.arm[ano].vel[jt], &data.arm[ano].eff[jt] );
                         joint_state_interface.registerHandle( state_handle );
+data.arm[ano].cmd[jt] = 0;// hayashi
                         hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
                         joint_position_interface.registerHandle( pos_handle );
                         ros::NodeHandle nh_limits(robot_name);
