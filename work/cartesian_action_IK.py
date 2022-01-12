@@ -40,7 +40,7 @@ class Client(object):
 
     def test(self):
         """ Follow two-point, random Cartesian trajectory
-        This samples uniformly in [-pi, +pi] for each joint to compute two
+launch/        This samples uniformly in [-pi, +pi] for each joint to compute two
         random poses within the robots reach.  It then traverses these points
         within 10 seconds.
         """
@@ -120,7 +120,7 @@ class Client(object):
             p = CartesianTrajectoryPoint()
             p.pose.position.x = 0.5
             p.pose.position.y = 0.3
-            p.pose.position.z = 0.7
+            p.pose.position.z = 0.9
             q = PyKDL.Rotation.GetQuaternion(p_kdl.M)
             p.pose.orientation.x = 0
             p.pose.orientation.y = 0
