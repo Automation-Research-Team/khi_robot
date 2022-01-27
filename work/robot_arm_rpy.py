@@ -97,8 +97,6 @@ class Client(object):
 
         def now_link6():
             try:
-                #self._listener.waitForTransform("arm_link6", "arm_base_link", rospy.Time(0), rospy.Duration(1.0))
-                #(now_position, now_quaternion) = self._listener.lookupTransform("arm_link6", "arm_base_link", rospy.Time(0))
                 self._listener.waitForTransform("arm_base_link", "arm_link6", rospy.Time(0), rospy.Duration(1.0))
                 (now_position, now_quaternion) = self._listener.lookupTransform("arm_base_link", "arm_link6", rospy.Time(0))
                 print ("now_position: ")
@@ -111,7 +109,6 @@ class Client(object):
                 self.now_quaternion = now_quaternion
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
                 rospy.logerr('Unknown pose: %s' % e)
-                #print ("lookupTransform except error")
 
             euler = tf.transformations.euler_from_quaternion(now_quaternion)
             self.roll = euler[0]
@@ -224,6 +221,8 @@ class Client(object):
             #select_menue = input('select character : ')
             select_menue = raw_input('select character : ')
 
+            print(type(select_menue))
+            print('path1 ',select_menue)
  
             if select_menue == 'o' :
                 p1 = org_point()
@@ -289,7 +288,7 @@ class Client(object):
                 self.pitch = float(input('input pitch : '))
                 self.yaw = float(input('input yaw : '))
                 p1 = rpy_point()
-            elif select_menue == 'h' :
+            elif select_menue == 'h' OR select_menue == 'help':
                 print("change parameter")
                 print("o: origin, x: x-axis, y: y-axis, z: z-axis, r: roll, p: pitch, ya: yaw, a: all input")
                 print("x+: x-axis 0.05m up, x-: x-axis 0.05m down")
