@@ -221,9 +221,6 @@ class Client(object):
             #select_menue = input('select character : ')
             select_menue = raw_input('select character : ')
 
-            print(type(select_menue))
-            print('path1 ',select_menue)
- 
             if select_menue == 'o' :
                 p1 = org_point()
             elif select_menue == 'x' :
@@ -288,7 +285,7 @@ class Client(object):
                 self.pitch = float(input('input pitch : '))
                 self.yaw = float(input('input yaw : '))
                 p1 = rpy_point()
-            elif select_menue == 'h' OR select_menue == 'help':
+            elif select_menue == 'h' or select_menue == 'help':
                 print("change parameter")
                 print("o: origin, x: x-axis, y: y-axis, z: z-axis, r: roll, p: pitch, ya: yaw, a: all input")
                 print("x+: x-axis 0.05m up, x-: x-axis 0.05m down")
