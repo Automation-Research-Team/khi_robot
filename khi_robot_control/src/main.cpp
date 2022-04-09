@@ -503,6 +503,12 @@ int main(int argc, char *argv[])
     g_options.write_ = true;
     g_options.rtcprog_ = "";
 
+    /* Set g_options from parameter server if specified */
+    ros::NodeHandlePtr	node = boost::make_shared<ros::NodeHandle>("~");
+    g_options.ip_      = node->param<std::string>("ip", "");
+    g_options.rtcprog_ = node->param<std::string>("rtcprog", "");
+    g_options.period_  = node->param<double>("period", 4.0) * 1e+6;
+    
     while (true)
     {
         static struct option long_options[] =
