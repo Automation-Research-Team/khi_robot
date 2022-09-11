@@ -82,6 +82,8 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
                         joint_state_interface.registerHandle( state_handle );
                         hardware_interface::JointHandle pos_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].cmd[jt] );
                         joint_position_interface.registerHandle( pos_handle );
+                        hardware_interface::JointHandle vel_handle( joint_state_interface.getHandle( data.arm[ano].name[jt] ), &data.arm[ano].vel_cmd[jt] );
+                        joint_velocity_interface.registerHandle( vel_handle );
                         ros::NodeHandle nh_limits(robot_name);
                         joint_limits_interface::JointLimits limits;
 
@@ -108,6 +110,7 @@ bool KhiRobotHardwareInterface::open( const std::string& robot_name, const std::
 
     registerInterface( &joint_state_interface );
     registerInterface( &joint_position_interface );
+    registerInterface( &joint_velocity_interface );
 
     /* start KhiRobotClient */
     client = new KhiRobotClient();

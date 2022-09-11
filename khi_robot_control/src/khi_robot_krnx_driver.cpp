@@ -644,6 +644,7 @@ bool KhiRobotKrnxDriver::setRobotDataHome( const int& cont_no, KhiRobotData& dat
         for ( int jt = 0; jt < data.arm[ano].jt_num; jt++ )
         {
             data.arm[ano].cmd[jt] = data.arm[ano].pos[jt] = data.arm[ano].home[jt];
+	    data.arm[ano].vel_cmd[jt] = 0.0;
         }
     }
 
@@ -686,6 +687,7 @@ bool KhiRobotKrnxDriver::writeData( const int& cont_no, const KhiRobotData& data
         for ( int jt = 0; jt < data.arm[ano].jt_num; jt++ )
         {
             p_rtc_data->comp[ano][jt] = (float)(data.arm[ano].cmd[jt] - data.arm[ano].home[jt]);
+	  //p_rtc_data->vel_comp[ano][jt] = (float)(data.arm[ano].vel_cmd[jt]);
             if ( data.arm[ano].type[jt] == urdf::Joint::PRISMATIC )
             {
                 p_rtc_data->comp[ano][jt] *= KHI_KRNX_M2MM;

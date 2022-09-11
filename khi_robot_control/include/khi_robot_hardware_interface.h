@@ -65,6 +65,7 @@ public:
 private:
     hardware_interface::JointStateInterface joint_state_interface;
     hardware_interface::PositionJointInterface joint_position_interface;
+    hardware_interface::VelocityJointInterface joint_velocity_interface;
     joint_limits_interface::PositionJointSaturationInterface joint_limit_interface;
 
     khi_robot_control::KhiRobotData data;

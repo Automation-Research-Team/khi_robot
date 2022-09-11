@@ -51,6 +51,7 @@ struct KhiRobotArmData
     std::string name[KHI_MAX_JOINT];
     int type[KHI_MAX_JOINT];
     double cmd[KHI_MAX_JOINT];
+    double vel_cmd[KHI_MAX_JOINT];
     double pos[KHI_MAX_JOINT];
     double vel[KHI_MAX_JOINT];
     double eff[KHI_MAX_JOINT];
