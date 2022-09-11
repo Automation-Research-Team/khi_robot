@@ -97,7 +97,7 @@ private:
 
     bool getCurMotionData( const int& cont_no, const int& robot_no, TKrnxCurMotionData* p_motion_data );
     int execAsMonCmd( const int& cont_no, const char* cmd, char* buffer, int buffer_sz, int* as_err_code );
-    bool retKrnxRes( const int& cont_no, const std::string& name, const int& ret, const bool error = true );
+    bool retKrnxRes( const int& cont_no, const std::string& name, const int& ret, const bool error = true, const char* cmd=nullptr );
     bool conditionCheck( const int& cont_no, const KhiRobotData& data );
     bool setRobotDataHome( const int& cont_no, KhiRobotData& data );
     std::vector<std::string> splitString( const std::string& str, const char& del );

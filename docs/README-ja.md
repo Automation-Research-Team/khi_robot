@@ -2,7 +2,7 @@ khi_robot [![Build Status](https://travis-ci.com/Kawasaki-Robotics/khi_robot.svg
 ===================================================================================================================================================
 
 このリポジトリではKHIのロボットのROSサポートパッケージを提供しています。  
-ROSのディストリビューション`Kinetic`と`Melodic`をサポートしています。
+ROSのディストリビューション`Kinetic`、`Melodic`、および`Noetic`をサポートしています。
 
 ## 起動方法
 
@@ -52,6 +52,7 @@ roslaunch ***_moveit_config moveit_planning_execution.launch
  * rs007l
  * rs007n
  * rs013n
+ * rs025n(加減速パラメータ調整中のためシミュレーションのみ対応)
  * rs80n
 
 ## ノート

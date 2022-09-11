@@ -73,9 +73,11 @@ KhiRobotKrnxDriver::~KhiRobotKrnxDriver()
 
 bool KhiRobotKrnxDriver::setState( const int& cont_no, const int& state )
 {
+    bool is_state_set;
     std::lock_guard<std::mutex> lock( mutex_state[cont_no] );
 
-    KhiRobotDriver::setState( cont_no, state );
+    is_state_set = KhiRobotDriver::setState( cont_no, state );
+    return is_state_set;
 }
 
 int KhiRobotKrnxDriver::execAsMonCmd( const int& cont_no, const char* cmd, char* buffer, int buffer_sz, int* as_err_code )
@@ -89,17 +91,20 @@ int KhiRobotKrnxDriver::execAsMonCmd( const int& cont_no, const char* cmd, char*
     }
     else
     {
-        retKrnxRes( cont_no, "krnx_ExecMon()", return_code );
+        retKrnxRes( cont_no, "krnx_ExecMon()", return_code, true, cmd );
     }
 
     return return_code;
 }
 
-bool KhiRobotKrnxDriver::retKrnxRes( const int& cont_no, const std::string& name, const int& ret, const bool error )
+    bool KhiRobotKrnxDriver::retKrnxRes( const int& cont_no, const std::string& name, const int& ret, const bool error, const char* cmd)
 {
     if ( ret != KRNX_NOERROR )
     {
-        errorPrint( "%s returned -0x%X", name.c_str(), -ret );
+	if (cmd)
+	    errorPrint( "%s returned -0x%X by %s", name.c_str(), -ret, cmd );
+	else
+	    errorPrint( "%s returned -0x%X", name.c_str(), -ret );
         if ( error ) { setState( cont_no, ERROR ); }
         return false;
     }
