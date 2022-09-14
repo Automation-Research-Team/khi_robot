@@ -256,7 +256,7 @@ bool KhiRobotKrnxDriver::activate( const int& cont_no, KhiRobotData& data )
     const int to_home_vel = 20; /* speed 20 */
     const double timeout_sec_th = 5.0; /* 5 sec */
     bool is_ready;
-    TKrnxCurMotionData motion_data = { 0 };
+    TKrnxCurMotionDataEx motion_data = { 0 };
     double timeout_sec_cnt = 0.0;
     int conv = 1;
     float diff = 0;
@@ -362,7 +362,7 @@ bool KhiRobotKrnxDriver::activate( const int& cont_no, KhiRobotData& data )
             return_code = krnx_GetRtcSwitch( cont_no, ano, &rtc_data[cont_no].sw );
             if ( ( return_code != KRNX_NOERROR ) || ( rtc_data[cont_no].sw == 0 ) ) { continue; }
 
-            return_code = krnx_GetCurMotionData( cont_no, ano, &motion_data );
+            return_code = krnx_GetCurMotionDataEx( cont_no, ano, &motion_data );
             if ( return_code != KRNX_NOERROR ) { continue; }
 
             is_ready = true;
@@ -559,34 +559,43 @@ bool KhiRobotKrnxDriver::readData( const int& cont_no, KhiRobotData& data )
         return true;
     }
 
-    static std::vector<TKrnxCurMotionData> motion_data[KRNX_MAX_CONTROLLER][KRNX_MAX_ROBOT];
-    TKrnxCurMotionData motion_cur[KRNX_MAX_ROBOT];
+    static std::vector<TKrnxCurMotionDataEx> motion_data[KRNX_MAX_CONTROLLER][KRNX_MAX_ROBOT];
+    TKrnxCurMotionDataEx motion_cur[KRNX_MAX_ROBOT];
     float ang[KRNX_MAX_ROBOT][KRNX_MAXAXES] = {{ 0 }};
     float vel[KRNX_MAX_ROBOT][KRNX_MAXAXES] = {{ 0 }};
 
     for ( int ano = 0; ano < arm_num; ano++ )
     {
         if ( !getCurMotionData( cont_no, ano, &motion_cur[ano] ) ) { return false; }
+#if 1
+        // ang
+        memcpy( ang[ano], &motion_cur[ano].ang, sizeof(motion_cur[ano].ang) );
 
-        if ( motion_data[cont_no][ano].size() >= KRNX_MOTION_BUF )
+        // vel
+        if ( motion_data[cont_no][ano].size() > 1 )
+        {
+	    const double	period = cont_info[cont_no].period/1e+9;
+
+	    for ( int jt=0; jt < KHI_MAX_JOINT; jt++ )
+            {
+                vel[ano][jt] = (motion_cur[ano].ang[jt] -
+				motion_data[cont_no][ano].back().ang[jt])
+			     / period;
+            }
+        }
+
+	if ( motion_data[cont_no][ano].size() >= KRNX_MOTION_BUF )
         {
             motion_data[cont_no][ano].erase( motion_data[cont_no][ano].begin() );
         }
         motion_data[cont_no][ano].push_back( motion_cur[ano] );
-
+#else
         // ang
         memcpy( ang[ano], &motion_cur[ano].ang, sizeof(motion_cur[ano].ang) );
         // vel
-        if ( motion_data[cont_no][ano].size() > 1 )
-        {
-            std::vector<TKrnxCurMotionData>::iterator it = motion_data[cont_no][ano].end();
-            it--;
-            for ( int jt=0; jt < KHI_MAX_JOINT; jt++ )
-            {
-                vel[ano][jt] = motion_data[cont_no][ano].back().ang[jt] - it->ang[jt];
-            }
-        }
-
+        memcpy( vel[ano], &motion_cur[ano].ang_vel,
+		sizeof(motion_cur[ano].ang_vel) );
+#endif
         for ( int jt = 0; jt < data.arm[ano].jt_num; jt++ )
         {
             data.arm[ano].pos[jt] = (double)ang[ano][jt];
@@ -599,17 +608,20 @@ bool KhiRobotKrnxDriver::readData( const int& cont_no, KhiRobotData& data )
                 data.arm[ano].pos[jt] /= KHI_KRNX_M2MM;
                 data.arm[ano].vel[jt] /= KHI_KRNX_M2MM;
             }
+
+	  //std::cerr << ' ' << vel[ano][jt];
         }
+      //std::cerr << std::endl;
     }
 
     return true;
 }
 
-bool KhiRobotKrnxDriver::getCurMotionData( const int& cont_no, const int& robot_no, TKrnxCurMotionData* p_motion_data )
+bool KhiRobotKrnxDriver::getCurMotionData( const int& cont_no, const int& robot_no, TKrnxCurMotionDataEx* p_motion_data )
 {
     if ( !contLimitCheck( cont_no, KRNX_MAX_CONTROLLER ) ) { return false; }
 
-    return_code = krnx_GetCurMotionData( cont_no, robot_no, p_motion_data );
+    return_code = krnx_GetCurMotionDataEx( cont_no, robot_no, p_motion_data );
 
     return retKrnxRes( cont_no, "krnx_GetCurMotionData", return_code );
 }
@@ -660,7 +672,7 @@ bool KhiRobotKrnxDriver::writeData( const int& cont_no, const KhiRobotData& data
     int idx, ano, jt;
     char msg[1024] = { 0 };
     char status[128] = { 0 };
-    TKrnxCurMotionData motion_data;
+    TKrnxCurMotionDataEx motion_data;
     float jt_pos = 0.0F;
     float jt_vel = 0.0F;
     bool is_primed = true;
@@ -934,7 +946,7 @@ bool KhiRobotKrnxDriver::loadRtcProg( const int& cont_no, const std::string& nam
 
 bool KhiRobotKrnxDriver::syncRtcPos( const int& cont_no, KhiRobotData& data )
 {
-    TKrnxCurMotionData motion_data = { 0 };
+    TKrnxCurMotionDataEx motion_data = { 0 };
 
     for ( int ano = 0; ano < data.arm_num; ano++ )
     {
