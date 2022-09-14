@@ -568,24 +568,27 @@ bool KhiRobotKrnxDriver::readData( const int& cont_no, KhiRobotData& data )
     {
         if ( !getCurMotionData( cont_no, ano, &motion_cur[ano] ) ) { return false; }
 
-        if ( motion_data[cont_no][ano].size() >= KRNX_MOTION_BUF )
+        // ang
+        memcpy( ang[ano], &motion_cur[ano].ang, sizeof(motion_cur[ano].ang) );
+
+        // vel
+        if ( motion_data[cont_no][ano].size() > 1 )
+        {
+	    const double	period = cont_info[cont_no].period/1e+9;
+	    
+            for ( int jt=0; jt < KHI_MAX_JOINT; jt++ )
+            {
+                vel[ano][jt] = (motion_cur[ano].ang[jt] -
+				motion_data[cont_no][ano].back().ang[jt])
+			     / period;
+            }
+        }
+
+	if ( motion_data[cont_no][ano].size() >= KRNX_MOTION_BUF )
         {
             motion_data[cont_no][ano].erase( motion_data[cont_no][ano].begin() );
         }
         motion_data[cont_no][ano].push_back( motion_cur[ano] );
-
-        // ang
-        memcpy( ang[ano], &motion_cur[ano].ang, sizeof(motion_cur[ano].ang) );
-        // vel
-        if ( motion_data[cont_no][ano].size() > 1 )
-        {
-            std::vector<TKrnxCurMotionData>::iterator it = motion_data[cont_no][ano].end();
-            it--;
-            for ( int jt=0; jt < KHI_MAX_JOINT; jt++ )
-            {
-                vel[ano][jt] = motion_data[cont_no][ano].back().ang[jt] - it->ang[jt];
-            }
-        }
 
         for ( int jt = 0; jt < data.arm[ano].jt_num; jt++ )
         {
