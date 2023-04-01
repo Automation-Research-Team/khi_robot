@@ -43,33 +43,29 @@ namespace khi_robot_control
 {
 void KhiCommandService( KhiRobotDriver* driver, const int& cont_no )
 {
-    using names_t = std::vector<std::string>;
-
     if ( driver == NULL ) return;
 
     ROS_INFO( "[KhiRobotCommandService] Start" );
 
   // Setup ROS service server.
-    ros::NodeHandlePtr	node = boost::make_shared<ros::NodeHandle>("~");
-    ros::ServiceServer
-	service = node->advertiseService<khi_robot_msgs::KhiRobotCmd::Request,
-					 khi_robot_msgs::KhiRobotCmd::Response>(
-			"khi_robot_command_service",
-			boost::bind(&KhiRobotDriver::commandHandler,
-				    driver, cont_no, _1, _2));
-    ros::AsyncSpinner	spinner(boost::thread::hardware_concurrency() - 1);
-    spinner.start();
+    const auto	nh	= boost::make_shared<ros::NodeHandle>("~");
+    const auto	service = nh->advertiseService<
+			      khi_robot_msgs::KhiRobotCmd::Request,
+			      khi_robot_msgs::KhiRobotCmd::Response>(
+				  "khi_robot_command_service",
+				  boost::bind(&KhiRobotDriver::commandHandler,
+					      driver, cont_no, _1, _2));
 
   // Load driver plugins.
-    names_t	plugin_names;
-    node->param<names_t>("plugins", plugin_names, names_t());
-
-    pluginlib::ClassLoader<DriverPlugin>	loader("khi_robot_control",
-						       "DriverPlugin");
-    std::vector<
-	boost::shared_ptr<DriverPlugin> >	plugins;
+    std::vector<boost::shared_ptr<DriverPlugin> >	plugins;
     try
     {
+	using plugin_names_t = std::vector<std::string>;
+	using loader_t	     = pluginlib::ClassLoader<DriverPlugin>;
+	
+	const auto	plugin_names = nh->param("plugins", plugin_names_t());
+	loader_t	loader("khi_robot_control", "DriverPlugin");
+	
 	for (const auto& plugin_name : plugin_names)
 	{
 	    plugins.push_back(loader.createInstance(plugin_name));
@@ -84,6 +80,9 @@ void KhiCommandService( KhiRobotDriver* driver, const int& cont_no )
 	ROS_ERROR("Failed to load/initalize driver plugin: %s", err.what());
     }
 
+  // Start spinner.
+    ros::AsyncSpinner	spinner(boost::thread::hardware_concurrency() - 1);
+    spinner.start();
     ros::waitForShutdown();
 }
 
