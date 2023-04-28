@@ -2,6 +2,13 @@
 Changelog for package khi_rs025n_moveit_config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0 (2023-04-28)
+------------------
+* Merge pull request `#68 <https://github.com/Kawasaki-Robotics/khi_robot/issues/68>`_ from matsui-hiro/add_rs025n
+  Add rs025n
+* Add rs025n
+* Contributors: HirokiTakami, matsui_hiro
+
 1.3.0 (2022-04-05)
 ------------------
 * Merge pull request `#52 <https://github.com/Kawasaki-Robotics/khi_robot/issues/52>`_ from k-okada/add_ikfast_plugin
