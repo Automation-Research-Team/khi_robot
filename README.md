@@ -1,4 +1,4 @@
-khi_robot [![Build Status](https://travis-ci.com/Kawasaki-Robotics/khi_robot.svg?branch=master)](https://travis-ci.com/Kawasaki-Robotics/khi_robot)
+khi_robot [![Build Status](https://github.com/Kawasaki-Robotics/khi_robot/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Kawasaki-Robotics/khi_robot/actions/workflows/ci.yml)
 ===================================================================================================================================================
 
 This repository provides ROS support for KHI robots.  
@@ -54,6 +54,7 @@ Refer to [docs/ConnectingRealRobot.md](docs/ConnectingRealRobot.md)
  * rs013n
  * rs020n
  * rs025n
+ * rs030n
  * rs80n
 
 ## Notes
